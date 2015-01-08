@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -22,9 +21,9 @@
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
- require_once $CFG->dirroot.'/blocks/teams/lib.php';
- 
+
+require_once($CFG->dirroot.'/blocks/teams/lib.php');
+
 class block_teams extends block_base {
 
     function init() {
@@ -45,7 +44,7 @@ class block_teams extends block_base {
 
     function get_content() {
         global $USER, $CFG, $COURSE, $DB, $PAGE, $OUTPUT;
-        
+
         $this->content = new stdClass;
         $this->content->items = array();
         $this->content->icons = array();
@@ -57,19 +56,26 @@ class block_teams extends block_base {
         if ($COURSE->groupmode != NOGROUPS) { //if groupmode for this course is set to seperate or visible.
             //get user group.
             $teams = teams_get_teams();
-                        
-            if (empty($teams)){
-            	if (!has_capability('block/teams:creategroup', $coursecontext)) { //if user isn't in a Group - throw an error.
-	                $this->content->text .= get_string('nogroupset', 'block_teams') . '<br/>';
-	                $this->content->text .= teams_show_user_invites($this, $USER->id, $COURSE->id);
-	            } else {
-	                $this->content->text .= teams_new_group_form($this);
-	                $this->content->text .= teams_show_user_invites($this, $USER->id, $COURSE->id);
-	            }
+
+            if (empty($teams)) {
+                // There are no teams at all.
+                if (!has_capability('block/teams:creategroup', $coursecontext)) { //if user isn't in a Group - throw an error.
+                    $this->content->text .= get_string('nogroupset', 'block_teams') . '<br/>';
+                    $this->content->text .= teams_show_user_invites($this, $USER->id, $COURSE->id);
+                } else {
+                    $this->content->text .= teams_new_group_form($this);
+                    $this->content->text .= teams_show_user_invites($this, $USER->id, $COURSE->id);
+                }
             } else {
-                //now display list of groups and their members
-                foreach($teams as $team) {
-                	$groupleader = $DB->get_record('user', array('id' => $team->leaderid));
+                // Now display list of groups and their members.
+                $hasateamasleader = false;
+                foreach ($teams as $team) {
+
+                     if ($team->leaderid == $USER->id) {
+                        $hasateamasleader = true;
+                    }
+
+                    $groupleader = $DB->get_record('user', array('id' => $team->leaderid));
                     $this->content->text .= "<strong>".get_string('group').":</strong> ".$team->name."<br/>";
                     $i = teams_print_team_members($team, $this->content->text);
 
@@ -79,44 +85,52 @@ class block_teams extends block_base {
                         foreach ($invites as $inv) {
                             $invitecount++;
                             $inuser = $DB->get_record('user', array('id' => $inv->userid));
-                            $this->content->text .= '<div class="teams-invited"><a href="'.$CFG->wwwroot.'/user/view.php?id='.$inv->userid.'&course='.$COURSE->id.'">'.fullname($inuser).'</a> ('.get_string('invited', 'block_teams').')</div>';
+                            $userurl = new moodle_url('/user/view.php', array('id' => $inv->userid, 'course' => $COURSE->id));
+                            $this->content->text .= '<div class="teams-invited"><a href="'.$userurl.'">'.fullname($inuser).'</a> ('.get_string('invited', 'block_teams').')</div>';
                             //show delete link
                             if ($groupleader == $USER->id) {
-                                $this->content->text .= ' <a href="'.$CFG->wwwroot.'/blocks/teams/manageteam.php?id='.$this->instance->id.'&groupid='.$group->id.'&action=deleteinv&userid='.$inv->userid.'"><img src="'.$OUTPUT->pix_url('t/delete').'"></a>';
+                                $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $group->id, 'what' => 'deleteinv', 'userid' => $inv->userid));
+                                $this->content->text .= ' <a href="'.$manageurl.'"><img src="'.$OUTPUT->pix_url('t/delete').'"></a>';
                             }
                             $this->content->text .='<br/>';
                         }
                     }
 
                     $this->content->text .='<br/>';
-                    //get max number of group members
-                    //check if groupleader and if max number of group members has not been exceeded and print invite link.
+                    // Get max number of group members.
+                    // Check if groupleader and if max number of group members has not been exceeded and print invite link.
                     if (($team->leaderid == $USER->id) && (($CFG->team_max_size > ($i + $invitecount)) || empty ($CFG->team_max_size))) {
-                        $this->content->text .= '&rsaquo; <a href="'.$CFG->wwwroot.'/blocks/teams/manageteam.php?id='.$this->instance->id.'&groupid='.$team->id.'">'.get_string('invitegroupmembers', 'block_teams').'</a><br/>';
+                        $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $team->id));
+                        $this->content->text .= '&rsaquo; <a href="'.$manageurl.'">'.get_string('invitegroupmembers', 'block_teams').'</a><br/>';
                     }
 
-                    if ($i > 1) { //if the group members is higher than 1 allow messaging.
-                        $this->content->text .= '&rsaquo; <a href="'.$CFG->wwwroot.'/blocks/teams/messageteam.php?id='.$this->instance->id.'&groupid='.$team->id.'">'.get_string('messagegroup', 'block_teams').'</a><br/>';
+                    if ($i > 1) {
+                        // If the group members is higher than 1 allow messaging.
+                        $messageurl = new moodle_url('/blocks/teams/messageteam.php', array('id' => $this->instance->id, 'groupid' => $team->id));
+                        $this->content->text .= '&rsaquo; <a href="'.$messageurl.'">'.get_string('messagegroup', 'block_teams').'</a><br/>';
                     }
-                    
-                    //check if this is the only member left and display a remove membership and delete group option.
+
+                    // Check if this is the only member left and display a remove membership and delete group option.
                     if (($i + $invitecount) == 1) {
-                        $this->content->text .= '&rsaquo; <a href="'.$CFG->wwwroot.'/blocks/teams/manageteam.php?id='.$this->instance->id.'&groupid='.$team->id.'&action=removegroup">'.get_string('deletegroup', 'block_teams').'</a><br/>';
+                        $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $team->id, 'what' => 'removegroup'));
+                        $this->content->text .= '&rsaquo; <a href="'.$manageurl.'">'.get_string('deletegroup', 'block_teams').'</a><br/>';
                     } elseif ($groupleader <> $USER->id) {
-                        $this->content->text .= '&rsaquo; <a href="'.$CFG->wwwroot.'/blocks/teams/manageteam.php?id='.$this->instance->id.'&groupid='.$team->id.'&action=delete&userid='.$USER->id.'">'.get_string('removemefromgroup', 'block_teams').'</a><br/>';
+                        $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $team->id, 'what' => 'delete', 'userid' => $USER->id));
+                        $this->content->text .= '&rsaquo; <a href="'.$manageurl.'">'.get_string('removemefromgroup', 'block_teams').'</a><br/>';
                     } elseif ($groupleader == $USER->id && $i > 1) {
-                        $this->content->text .= '&rsaquo; <a href="'.$CFG->wwwroot.'/blocks/teams/manageteam.php?id='.$this->instance->id.'&groupid='.$team->id.'&action=transfer">'.get_string('transferleadership', 'block_teams').'</a><br/>';
+                        $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $team->id, 'what' => 'transfer'));
+                        $this->content->text .= '&rsaquo; <a href="'.$manageurl.'">'.get_string('transferleadership', 'block_teams').'</a><br/>';
                     }
                 }
 
-	            if (!empty($this->config->allowmultipleteams)) {
-	                $this->content->text .= teams_show_user_invites($this, $USER->id, $COURSE->id);
-	            }
+                if (!empty($this->config->allowmultipleteams)) {
+                    $this->content->text .= teams_show_user_invites($this, $USER->id, $COURSE->id);
+                }
 
-	            if (!empty($this->config->allowleadmultipleteams)) {
-	                //print form
-	                $this->content->text .= teams_new_group_form($this);
-	            }
+                if (!empty($this->config->allowleadmultipleteams) || !$hasateamasleader) {
+                    // If i am not leader, or can have mulitple leaderships
+                    $this->content->text .= teams_new_group_form($this);
+                }
             }
         } else {
             if ($PAGE->user_is_editing()) {

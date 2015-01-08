@@ -4,18 +4,18 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-	<TABLE NAME="block_teams" COMMENT="stores team leader information" NEXT="block_teams_invites">
+    <TABLE NAME="block_teams" COMMENT="stores team leader information" NEXT="block_teams_invites">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="groupid"/>
         <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="leaderid"/>
         <FIELD NAME="leaderid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="groupid" NEXT="open"/>
         <FIELD NAME="open" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="leaderid"/>
-	  </FIELDS>
+      </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-	<TABLE NAME="block_teams_invites" COMMENT="stores invites pending for teams" PREVIOUS="block_teams">
+    <TABLE NAME="block_teams_invites" COMMENT="stores invites pending for teams" PREVIOUS="block_teams">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="courseid"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
@@ -27,6 +27,6 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
-	</TABLE>
+    </TABLE>
   </TABLES>
 </XMLDB>
