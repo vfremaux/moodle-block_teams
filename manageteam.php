@@ -15,16 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
- * @package    blocks-tao-teams
- * @author     Dan Marsden <dan@danmarsden.com>
+ * @package    block_teams
+ * @author     Valery Fremaux
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
- * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
+ * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  *
  * manages Team Groups
- *
  */
-
 require('../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->dirroot.'/user/filters/lib.php');
@@ -39,15 +36,30 @@ $groupname = optional_param('groupname', '', PARAM_TEXT);
 $action = optional_param('what', '', PARAM_ALPHA);
 $inviteuserid = optional_param('userid', '', PARAM_INT);
 
+$url = new moodle_url('/blocks/teams/manageteam.php', array('id' => $blockid, 'groupid' => $groupid));
+$PAGE->set_url($url);
+
 if (!$instance = $DB->get_record('block_instances', array('id' => $blockid))) {
     print_error('errorinvalidblock', 'block_teams');
 }
+
+$context = context::instance_by_id($instance->parentcontextid);
+$PAGE->set_context($context);
+
 if (!$theblock = block_instance('teams', $instance)) {
     print_error('errorbadblockinstance', 'block_teams');
 }
 
-$context = context::instance_by_id($theblock->instance->parentcontextid);
+require_login();
+
 $courseid = $context->instanceid;
+$group = $DB->get_record('groups', array('id' => $groupid));
+if ($group) {
+    $team = $DB->get_record('block_teams', array('groupid' => $group->id));
+} else {
+    $group = new StdClass();
+    $group->name = $groupname;
+}
 
 // Used by search form.
 $sort         = optional_param('sort', 'name', PARAM_ALPHA);
@@ -59,6 +71,7 @@ if (! ($course = $DB->get_record('course', array('id' => $courseid))) ) {
     print_error('coursemisconf');
 }
 
+echo "course:$courseid";
 if (!empty($groupid) && !($group = $DB->get_record('groups', array('id' => $groupid, 'courseid' => $courseid)))) {
     print_error('invalidgroupid', 'block_teams');
 }
@@ -69,116 +82,27 @@ require_course_login($course, true);
 
 // Header and page start.
 
-$url = new moodle_url('/blocks/teams/manageteam.php', array('id' => $courseid, 'groupid' => $groupid));
-
-$PAGE->set_url($url);
-$PAGE->set_context($context);
 $PAGE->set_heading($strheading);
 $PAGE->set_pagelayout('standard');
 $PAGE->navbar->add(get_string('teamgroups', 'block_teams'));
 $PAGE->navbar->add(get_string('manageteamgroup', 'block_teams'));
 
-echo $OUTPUT->header();
-
-echo $OUTPUT->heading(get_string('teamgroups', 'block_teams'));
-
-if ($action == 'joingroup') {
-    if ($COURSE->groupmode != NOGROUPS) {
-        // If groupmode for this course is set to seperate.
-        $groups = groups_get_all_groups($COURSE->id, $USER->id);
-        if (empty($groups)) {
-            // If user isn't in a Group - display invites and add group stuff.
-            echo teams_show_user_invites($USER->id, $COURSE->id);
-            echo teams_new_group_form($COURSE->id);
-            echo $OUTPUT->footer();
-            exit;
-        } else {
-            echo $OUTPUT->notification(get_string('alreadyinagroup', 'block_teams'));
-            echo $OUTPUT->continue_button(new moodle_url('/course/view.php', array('id' => $COURSE->id)));
-            echo $OUTPUT->footer();
-            exit;
-        }
-    }
-    unset($action);
-} elseif ($action == 'creategroup') {
-    
-    if (empty($groupname)) {
-        echo $OUTPUT->notification(get_string('emptygroupname', 'block_teams'));
-        echo $OUTPUT->continue_button(new moodle_url('/course/view.php', array('id' => $COURSE->id)));
-        echo $OUTPUT->footer();
-        exit;
-    }
-
-    $groups = groups_get_all_groups($courseid, $USER->id);
-
-    if (!empty($groups) && !has_capability('block/teams:applytomany', $context)) {
-        // PTS can only be a member of one group.
-        echo $OUTPUT->notification(get_string('alreadyinagroup', 'block_teams'));
-        echo $OUTPUT->continue_button($CFG->wwwroot."/course/view.php?id=$COURSE->id");
-        echo $OUTPUT->footer();
-        exit;
-    }
-
-    if ($DB->record_exists('groups', array('name' => $groupname))) {
-        echo $OUTPUT->notification(get_string('groupexists', 'block_teams'));
-        echo $OUTPUT->continue_button($CFG->wwwroot."/course/view.php?id=$COURSE->id");
-        echo $OUTPUT->footer();
-        exit;
-    }
-
-    // Create new group.
-    $newgroup = new stdClass;
-    $newgroup->name = $groupname;
-    $newgroup->picture = 0;
-    $newgroup->hidepicture = 0;
-    $newgroup->timecreated = time();
-    $newgroup->timemodified = time();
-    $newgroup->courseid = $courseid;
-    if (!$groupid = $DB->insert_record('groups', $newgroup)) {
-        print_error('errorcreategroup', 'block_teams');
-    }
-
-    // Register team aside to group record.
-    $newteam = new stdClass;
-    $newteam->groupid = $groupid;
-    $newteam->leaderid = $USER->id;
-    $newteam->open = 1;
-    if (!$DB->insert_record('block_teams', $newteam)) {
-        print_error('errorregisterteam', 'block_teams');
-    }
-
-    // Now assign $USER as a member of the group.
-    $newgroupmember = new stdClass;
-    $newgroupmember->groupid = $groupid;
-    $newgroupmember->userid = $USER->id;
-    $newgroupmember->timeadded = time();
-    if (!$groupid = $DB->insert_record('groups_members', $newgroupmember)) {
-        print_error('errorcouldnotassignmember', 'block_teams');
-    }
-
-    // If a special role assign needs to be added to user, add it
-    if (!empty($CFG->team_leader_role)) {
-        if ($DB->record_exists('role', array('id' => $CFG->team_leader_role))) {
-            $coursecontext = context_course::instance($course->id);
-            role_assign($CFG->team_leader_role, $USER->id, $coursecontext->id);
-        } else {
-            // If role doees not exist anymore, just reset the setting peacefully.
-            set_config('team_leader_role', 0);
-        }
-    }
-
-    $group = $DB->get_record('groups', array('id' => $groupid));
-
-    echo $OUTPUT->notification(get_string('groupcreated', 'block_teams'), 'notifysuccess');
-    echo $OUTPUT->continue_button(new moodle_url('/course/view.php', array('id' => $COURSE->id)));
-    unset($action);
-}
+// Fetch context known data
 
 $team = $DB->get_record('block_teams', array('groupid' => $groupid));
+
+// Start output.
+
+echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('teamgroup', 'block_teams', $group->name));
+
+// Play master controller
 
 if (!empty($action)) {
     include $CFG->dirroot.'/blocks/teams/manageteam.controller.php';
 }
+
+// Display effective membership.
 
 if (empty($action) && isset($group->id)) {
     echo $OUTPUT->heading(get_string('groupmembers','block_teams'));
@@ -190,14 +114,14 @@ if (empty($action) && isset($group->id)) {
         $table->header = array('', '');
         $table->size = array('70%', '30%');
         $table->align = array('left', 'right');
-        $table->width = '80%';
+        $table->width = '100%';
         foreach ($grpmembers as $gm) {
             $userurl = new moodle_url('/user/view.php', array('id' => $gm->id, 'course' => $COURSE->id));
             $userlink = '<a href="'.$userurl.'">'.fullname($gm).'</a>';
             $cmds = '';
-            if ($gm->id != $USER->id){
+            if ($gm->id != $USER->id) {
                 $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $blockid, 'what' => 'transferuser', 'userid' => $gm->id, 'groupid' => $groupid));
-                $cmds .= ' <a title="'.get_string('transferto', 'block_teams').'" href="'.$manageurl.'"><img src="'.$OUTPUT->pix_url('transfer', 'block_team').'" /></a>';
+                $cmds .= ' <a title="'.get_string('transferto', 'block_teams').'" href="'.$manageurl.'"><img src="'.$OUTPUT->pix_url('transfer', 'block_teams').'" /></a>';
             }
             $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $blockid, 'what' => 'delete', 'userid' => $gm->id, 'groupid' => $groupid));
             $cmds .= ' <a title="'.get_string('deletemember', 'block_teams').'" href="'.$manageurl.'"><img src="'.$OUTPUT->pix_url('t/delete').'" /></a>';
@@ -209,34 +133,44 @@ if (empty($action) && isset($group->id)) {
     echo $OUTPUT->box_end();
 }
 
+// Display pending invitations.
+
+echo '<br/><center>';
+echo $OUTPUT->single_button(new moodle_url('/course/view.php', array('id' => $COURSE->id)), get_string('backtocourse', 'block_teams'));
+echo '</center><br/>';
+
 // Don't show invites or the ability to invite people as this is an accept/decline request.
-if (isset($group->id) && empty($action) && $team->leaderid == $USER->id) {
+if (isset($group->id) && empty($action) && ($team->leaderid == $USER->id) && (($theblock->config->teamsmaxsize > count($grpmembers) || empty($theblock->config->teamsmaxsize)))) {
     $invites = $DB->get_records('block_teams_invites', array('groupid' => $group->id));
     $invitecount = 0;
     echo $OUTPUT->box_start('generalbox');
     if (!empty($invites)) {
-        echo $OUTPUT->heading(get_string('groupinvites','block_teams'));
+        echo $OUTPUT->heading_with_help(get_string('groupinvites','block_teams'), 'groupinvites', 'block_teams');
 
         $table = new html_table();
         $table->header = array('', '');
-        $table->size = array('70%', '30%');
-        $table->align = array('left', 'right');
-        $table->width = '80%';
+        $table->size = array('50%', '30%', '20%');
+        $table->align = array('left', 'left', 'right');
+        $table->width = '100%';
         foreach ($invites as $inv) {
             $inuser = $DB->get_record('user', array('id' => $inv->userid));
             $userurl = new moodle_url('/user/view.php', array('id' => $inv->userid, 'course' => $COURSE->id));
             $userlink = '<a href="'.$userurl.'">'.fullname($inuser).'</a>';
+            $cmds = '';
+            if (has_capability('block/teams:addinstance', $context)) {
+                // Add capability to force acceptance
+                $accepturl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $blockid, 'what' => 'accept', 'userid' => $inv->userid, 'groupid' => $groupid));
+                $cmds = '<a title="'.get_string('forceinvite', 'block_teams').'" href="'.$accepturl.'"><img src="'.$OUTPUT->pix_url('t/add').'" /></a>';
+            }
             $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $blockid, 'what' => 'deleteinv', 'userid' => $inv->userid, 'groupid' => $groupid));
-            $cmds = '<a title="'.get_string('revokeinvite', 'block_teams').'" href="'.$manageurl.'"><img src="'.$OUTPUT->pix_url('t/delete').'" /></a>';
-            $table->data[] = array($userlink, $cmds);
+            $cmds .= ' <a title="'.get_string('revokeinvite', 'block_teams').'" href="'.$manageurl.'"><img src="'.$OUTPUT->pix_url('t/delete').'" /></a>';
+            $date = teams_date_format($inv->timemodified);
+            $table->data[] = array($userlink, $date, $cmds);
             $invitecount++;
         }
         echo html_writer::table($table);
     }
     echo $OUTPUT->box_end();
-    echo '<br/><center>';
-    echo $OUTPUT->single_button($CFG->wwwroot.'/course/view.php?id='.$COURSE->id, get_string('backtocourse', 'block_teams'));
-    echo '</center><br/>';
 
     echo $OUTPUT->heading(get_string('inviteauser','block_teams'), 3);
 
@@ -244,14 +178,14 @@ if (isset($group->id) && empty($action) && $team->leaderid == $USER->id) {
 
     $usersearchcount = 0;
 
-    if (!@$CFG->teams_max_size || ($CFG->teams_max_size > ($i + $invitecount))) {
+    if (empty($theblock->config->teamsmaxsize) || ($theblock->config->teamsmaxsize > ($i + $invitecount))) {
         // Check if max number of group members has not been exceeded and print invite link.
         echo '<p>'.get_string('searchforusersdesc','block_teams').'</p>';
 
         // Print search form
 
         $userscopeclause = '';
-        if (empty($thBlock->config->allowsiteinvite)) {
+        if (empty($theblock->config->allowsiteinvite)) {
             if ($courseusers = get_enrolled_users($context)) {
                 $courseuserlist = implode('","', array_keys($courseusers));
                 $userscopeclause = ' AND id IN ("'.$courseuserlist.'") ';
@@ -268,7 +202,7 @@ if (isset($group->id) && empty($action) && $team->leaderid == $USER->id) {
                             'profile' => 1, 'mnethostid' => 1), null, array('id' => $blockid, 'groupid' => $groupid, 'perpage' => $perpage, 'page' => $page, 'sort' => $sort, 'dir' => $dir));
         list($extrasql, $params) = $ufiltering->get_sql_filter();
 
-        if (!empty($extrasql)) {
+        if (empty($extrasql)) {
             // Don't bother to do any of the following unless a filter is already set!
             // Exclude users already in a team group inside this course.
             $extrasql = "

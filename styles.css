@@ -1,14 +1,43 @@
 .team-invite {
-	border:1px solid #606060;
-	border-radius:3px;
-	padding:1px;
+    border:1px solid #606060;
+    border-radius:3px;
+    padding:1px;
 }
 
 .team-groupname {
-	font-weight:bolder;
+    font-weight:bolder;
 }
 
 .team-invided-member {
-	opacity:0.5;
-	moz-opacity:0.5;
+    opacity:0.5;
+    moz-opacity:0.5;
+}
+
+.team-instance {
+    margin-bottom:10px;
+}
+
+.team-status-indicator {
+    float:right;
+} 
+
+team-shadowed {
+    opacity:0.5;
+    -moz-opacity:0.5;
+}
+
+.team-date-green{
+    color:#2B8C20;
+}
+
+.team-date-yellow{
+    color:#ABB324;
+}
+
+.team-date-orange{
+    color:#A28824;
+}
+
+.team-date-red{
+    color:#D73939;
 }
