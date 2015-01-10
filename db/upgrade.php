@@ -12,6 +12,20 @@ function xmldb_block_teams_upgrade($oldversion=0) {
 
     $dbman = $DB->get_manager();
 
+    if ($result && $oldversion < 2015010800) {
+
+        $table = new xmldb_table('block_teams');
+
+        $field = new xmldb_field('courseid');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'id');
+        if (!$dbman->field_exists($table, $field)) {
+            // Launch add field refresh
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_block_savepoint(true, 2015010800, 'teams');
+    }
+
     return $result;
 }
 

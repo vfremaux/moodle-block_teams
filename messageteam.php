@@ -15,15 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    blocks-tao-teams
- * @author     Dan Marsden <dan@danmarsden.com>
+ * @package    block_teams
+ * @author     Valery Fremaux
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
- * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
- *
- * sends messages to group members
- *
+ * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  */
-
 require('../../config.php');
 require_once($CFG->dirroot.'/blocks/teams/forms/group_message_send_form.php');
 require_once($CFG->dirroot.'/blocks/teams/lib.php');
@@ -54,12 +50,12 @@ if (!empty($groupid) && !($group = $DB->get_record('groups', array('id' => $grou
 require_course_login($course, true);
 
 // Header and page start.
-$url = $CFG->wwwroot.'/blocks/teams/manageteam.php?id='.$courseid;
+$url = new moodle_url('/blocks/teams/manageteam.php', array('id' => $courseid));
 $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_heading($strheading);
 if ($context) {
-    $PAGE->navigation->add($course->fullname, $CFG->wwwroot.'/course/view.php?id='.$courseid);
+    $PAGE->navbar->add($course->fullname, $CFG->wwwroot.'/course/view.php?id='.$courseid);
 }
 $PAGE->navigation->add(get_string('teamgroups', 'block_teams'));
 
@@ -67,47 +63,47 @@ if (groups_is_member($groupid)) {
     $grpmembers = groups_get_members($groupid);
     if (count($grpmembers) > 1) {
 
-            require_once($CFG->dirroot . '/message/lib.php');
+        require_once($CFG->dirroot.'/message/lib.php');
 
-            $mform = new TeamGroupMessageForm('', array('course' => $COURSE, 'group' => $group, 'count' => count($grpmembers)-1));
+        $mform = new TeamGroupMessageForm('', array('course' => $COURSE, 'group' => $group, 'count' => count($grpmembers)-1));
 
-            if ($mform->is_cancelled()) {
-                redirect($CFG->wwwroot.'/course/view.php?id='.$COURSE->id);
-            }
+        if ($mform->is_cancelled()) {
+            redirect(new moodle_url('/course/view.php', array('id' => $COURSE->id)));
+        }
 
-            if ($data = $mform->get_data()) {
+        if ($data = $mform->get_data()) {
 
-                echo $OUTPUT->header();
-                echo $OUTPUT->heading(get_string('messagegroup', 'block_teams'));
+            echo $OUTPUT->header();
+            echo $OUTPUT->heading(get_string('messagegroup', 'block_teams'));
 
-                foreach ($grpmembers as $touser) {
-                    if ($touser->id <> $USER->id) {
-                        // Don't send a message to yourself.
-                        message_post_message($USER, $touser, $data->body, $data->format, 'direct');
-                    }
+            foreach ($grpmembers as $touser) {
+                if ($touser->id <> $USER->id) {
+                    // Don't send a message to yourself.
+                    message_post_message($USER, $touser, $data->body, $data->format, 'direct');
                 }
-                echo $OUTPUT->notification(get_string('groupmessagesent','block_teams'),'notifysuccess');
-                $grpmembers = groups_get_members($groupid);
-                $groupleader = teams_get_leader($groupid);
-
-                $i = 0;
-                foreach ($grpmembers as $gm) {
-                    $i++;
-                    echo "<a href='$CFG->wwwroot/user/view.php?id=$gm->id&course=$COURSE->id'>".fullname($gm)."</a>";
-                    if ($groupleader == $gm->id) {
-                        echo '('.get_string('leader', 'block_teams').')';
-                    }
-                    echo '<br/>';
-                }
-            } else {
-                echo $OUTPUT->header();
-                echo $OUTPUT->heading(get_string('messagegroup', 'block_teams'));
             }
+            echo $OUTPUT->notification(get_string('groupmessagesent','block_teams'),'notifysuccess');
+            $grpmembers = groups_get_members($groupid);
+            $groupleader = teams_get_leader($groupid);
+
+            $i = 0;
+            foreach ($grpmembers as $gm) {
+                $i++;
+                echo "<a href='$CFG->wwwroot/user/view.php?id=$gm->id&course=$COURSE->id'>".fullname($gm)."</a>";
+                if ($groupleader == $gm->id) {
+                    echo '('.get_string('leader', 'block_teams').')';
+                }
+                echo '<br/>';
+            }
+        } else {
+            echo $OUTPUT->header();
+            echo $OUTPUT->heading(get_string('messagegroup', 'block_teams'));
+        }
     } else {
         echo $OUTPUT->header();
         echo $OUTPUT->heading(get_string('messagegroup', 'block_teams'));
         echo $OUTPUT->notification(get_string('messagenorecipients', 'block_teams'));
-        echo $OUTPUT->continue_button($CFG->wwwroot.'/course/view.php?id='.$COURSE->id);
+        echo $OUTPUT->continue_button(new moodle_url('/course/view.php', array('id' => $COURSE->id)));
     }
 } else {
     print_error('errornomember', 'block_teams');

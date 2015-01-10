@@ -5,14 +5,14 @@ $string['teams:addinstance'] = 'Can add an instance';
 $string['teams:myaddinstance'] = 'Can add an instance to my page';
 $string['teams:creategroup'] = 'Can create a team';
 $string['teams:transferownership'] = 'Can transfer ownership';
-$string['teams:apply'] = 'Can apply to a team';
-$string['teams:applytomany'] = 'Can apply to several teams';
-$string['teams:invite'] = 'Can invite other users';
+$string['teams:apply'] = 'Can apply to an open team';
 
 //groups stuff
+
 $string['accept'] = 'Accept';
 $string['acceptinvite'] = 'Are you sure you want to accept this invitation';
 $string['allowleaderteams'] = 'Allow user to lead several teams';
+$string['allowleadmultipleteams'] = 'Allow user to lead several teams';
 $string['allowmultipleteams'] = 'Allow user to belong to several teams';
 $string['allowteamsiteinvite'] = 'Invite members from whole site';
 $string['alreadyinagroup'] = 'You are already in a team inside this course';
@@ -20,6 +20,8 @@ $string['alreadyinvited'] = 'This user has already been invited to join one team
 $string['alreadyinvitedtogroup'] = 'This user has already been invited to join the team';
 $string['backtocourse'] = 'Back to course';
 $string['blockname'] = 'Teams';
+$string['configdefaultteamvisibility'] = 'If checked, all teams are visible for everyone. if unchecked, users will only see teams they are member of or they are invited in';
+$string['configdefaultteaminviteneedsacceptance'] = 'If enabled, an invite needs to be acknowledged by the invited user. If disabled, an invited user is directly set as active member of the group. this is the default value for any new Teams block.';
 $string['configteamleaderrole'] = 'If set, any group leader will get an additional role assignation to this role';
 $string['configteammaxsizedefault'] = 'Set a default limit size for a team (applicable to all site). 0 stands for no limit.';
 $string['configteamsiteinvite'] = 'If enabled, teachers will be able to open the invitation range to all site. In this case, new team members will also be enrolled in the course';
@@ -34,12 +36,14 @@ $string['deletegroup'] = 'Delete this team';
 $string['deleteinvconfirmemailsubject'] = 'course Team Invite Removed';
 $string['deletemember'] = 'Revoke this member';
 $string['emailconfirmsent'] = 'An invitation email should have been sent to the address at <b>{$a}</b>';
+$string['errorbaduser'] = 'current user is not in invite';
 $string['errorcouldnotassignmember'] = 'could not insert record into groups members table';
 $string['errordeleteleader'] = 'You are leader of this group. You cannot delete yourself from the team until you give leadership to someone else !';
 $string['erroremptygroupname'] = 'Group name cannot be empty';
 $string['errorgroupdelete'] = 'you cannot delete this group';
 $string['errorinvalidaction'] = 'Invalid Action';
 $string['errorinvalidgroupid'] = 'Invalid group id';
+$string['errorinvalidinvite'] = 'Ivalid Invitation';
 $string['errorinvalidrequest'] = 'Invalid Request';
 $string['errornoleader'] = 'you are not the leader of this group';
 $string['errornomember'] = 'you are not a member of this group';
@@ -71,6 +75,7 @@ $string['leader'] = 'Leader';
 $string['localsettings'] = 'Local Settings';
 $string['lpmustbepublished'] = 'This course must be published to view teams';
 $string['manageteamgroup'] = 'Manage Team';
+$string['memberadded'] = 'Member has been added';
 $string['memberdeleted'] = 'User has been deleted from the team';
 $string['message'] = 'Message';
 $string['messagebody'] = 'Message body';
@@ -93,37 +98,67 @@ $string['sendingmessagetoteam'] = 'Sending message to team';
 $string['sendmessage'] = 'Send';
 $string['similarusers'] = 'Users with similar interests';
 $string['startmygroup'] = 'Start My Own Team';
+$string['teamgroup'] = 'Team: {$a}';
 $string['teamgroups'] = 'Teams';
+$string['teaminviteneedsacceptance'] = 'Enable invite acceptance';
+$string['defaultteaminviteneedsacceptance'] = 'Enable invite acceptance (default)';
+$string['defaultteamvisibility'] = 'Default team visibility';
+$string['teamvisibility'] = 'Default team visibility';
 $string['teamleaderrole'] = 'Leader additional role';
 $string['teammaxsizedefault'] = 'Team max size default';
 $string['teamsiteinvite'] = 'Allow site level invitation';
-$string['teamsmaxsize'] = 'Team max size';
+$string['teamsmaxsize'] = 'Team max size (leader included)';
 $string['transferconfirmed'] = 'Leadership has been Transferred Successfully';
 $string['transferleadership'] = 'Transfer Leadership';
+$string['transferto'] = 'Transfer Leadership to';
 $string['transferuser'] = 'Are you sure you want to transfer leadership for the team: {$a->group}, to the user: {$a->user}';
 $string['useralreadyingroup'] = 'That user is already assigned to a team in this course';
+$string['openteam'] = 'Make team visible to all';
+$string['closeteam'] = 'Make team private';
+$string['open'] = 'Team is visible';
+$string['closed'] = 'Team is private';
+$string['forceinvite'] = 'Force invite';
+$string['inviteforced'] = 'Invite has been forced in.';
 
-// messages
+$string['initiallyclosed'] = 'Initially private';
+$string['initiallyopen'] = 'Initially visible';
+$string['forcedclosed'] = 'Private (forced)';
+$string['forcedopen'] = 'Visible (forced)';
 
+/* messages */
+
+$string['inviteemailsubject'] = 'Teams / Group invite';
 $string['inviteemailbody'] = 'Hi, {$a->firstname},
 
 I invite you to join the team "{$a->group}" in the course "{$a->course}", use the following link for more information
 {$a->link}
 ';
 
+$string['addmembermailsubject'] = 'Teams / Group registered';
+$string['addmemberemailbody'] = 'Hi, {$a->firstname},
+
+I have added you to my team "{$a->group}" in the course "{$a->course}", use the following link for more information
+{$a->link}
+';
+
+$string['confirmdeclineemailsubject'] = 'Teams / Group invite declined';
 $string['confirmdeclineemailbody'] = 'Hi {$a->firstname},
 
 {$a->user} has declined your invitation to join the team "{$a->group}" in the course "{$a->course}"
 ';
 
+$string['confirmacceptemailsubject'] = 'Teams / Group invite accepted';
 $string['confirmacceptemailbody'] = 'Hi {$a->firstname},
 
 {$a->user} has accepted your invitation to join the Team "{$a->group}" in the course "{$a->course}"';
 
+$string['deleteconfirmemailsubject'] = 'Teams / Member deletion';
 $string['deleteconfirmemailbody'] = 'Hi {$a->firstname},
 
-{$a->user} has been removed from the Team "{$a->group}" in the course "{$a->course}"';
+{$a->user} has been removed from the Team "{$a->group}" in the course "{$a->course}"
+';
 
+$string['deleteinvconfirmemailsubject'] = 'Teams / Invite deletion';
 $string['deleteinvconfirmemailbody'] = 'Hi {$a->firstname},
 
 The invite for {$a->user} to the Team "{$a->group}" in the course "{$a->course}" has been removed.';
@@ -144,4 +179,27 @@ then cut and paste the address into the address
 line at the top of your web browser window.
 
 If you need help, please contact the site administrator,
-{$a->admin}';
+{$a->admin}
+';
+
+/* Helpers */
+
+$string['groupinvites_help'] = '
+This section lists people having received an invitation to enter the team from the team leader. Invited users should accept the invitation before
+they are actually member of the group.
+';
+
+$string['teamvisibility_help'] = '
+Teams can be private or visible. this setting determines the initial state of any new teams, and wether this state can be changed or not:
+
+* Initially private: New teams are private, but leaders can publish them.
+* Initially visible: New teams are visible, but leaders might turn them private.
+* Forced private: All teams remain private. If this option is turned on after teams have been created, all older teams will have state changed to private.
+* Forced visible: All teams remain visible. If this option is turned on after teams have been created, all older teams will have state changed to visible.
+';
+
+$string['teaminviteneedsacceptance_help'] = '
+If invite acceptance is enabled (default), then an invited user will have to explictely acknowledge the invite before he actually gets group membership.
+
+If this feature is disabled, group leaders can add members directly whthout having to wait for peer confirmation.
+';
