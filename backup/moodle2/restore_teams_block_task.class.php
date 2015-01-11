@@ -48,38 +48,10 @@ class restore_teams_block_task extends restore_block_task {
     }
 
     static public function define_decode_contents() {
-
-        $contents = array();
-
-        $contents[] = new restore_teams_block_decode_content('block_instances', 'configdata');
-
-        return $contents;
+        return array();
     }
 
     static public function define_decode_rules() {
         return array();
-    }
-}
-
-/**
- * Specialised restore_decode_content provider that unserializes the configdata
- * field, to serve the configdata->text content to the restore_decode_processor
- * packaging it back to its serialized form after process
- */
-class restore_teams_block_decode_content extends restore_decode_content {
-
-    // Temp storage for unserialized configdata.
-    protected $configdata;
-
-    protected function get_iterator() {
-        global $DB;
-
-        return (array());
-    }
-
-    protected function preprocess_field($field) {
-    }
-
-    protected function postprocess_field($field) {
     }
 }
