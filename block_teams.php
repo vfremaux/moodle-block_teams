@@ -86,6 +86,9 @@ class block_teams extends block_base {
                 $hasateamasleader = false;
                 foreach ($teams as $team) {
 
+                    // Normalise record.
+                    $team->groupid = $team->id;
+
                     if ($team->leaderid == $USER->id) {
                         $hasateamasleader = true;
                     }
@@ -94,34 +97,15 @@ class block_teams extends block_base {
                     $this->content->text .= '<div class="team-instance">';
                     $this->content->text .= '<div class="team-status-indicator">'.$this->renderer->private_state($this, $team->id).'</div>';
                     $this->content->text .= "<strong>".get_string('group').":</strong> ".$team->name."<br/>";
+
+                    // Render group members
                     $i = $this->renderer->team_members($team, $this->content->text);
 
-                    $invites = $DB->get_records('block_teams_invites', array('groupid' => $team->id));
-                    $invitecount = 0;
-                    if (!empty($invites)) {
-                        foreach ($invites as $inv) {
-                            $invitecount++;
-                            $inuser = $DB->get_record('user', array('id' => $inv->userid));
-                            $userurl = new moodle_url('/user/view.php', array('id' => $inv->userid, 'course' => $COURSE->id));
-                            $this->content->text .= '<div class="teams-invited"><a href="'.$userurl.'">'.fullname($inuser).'</a> ('.get_string('invited', 'block_teams').')</div>';
-                            //show delete link
-                            if ($groupleader == $USER->id) {
-                                // Delete pending invite.
-                                $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $group->id, 'what' => 'deleteinv', 'userid' => $inv->userid));
-                                $this->content->text .= ' <a href="'.$manageurl.'"><img src="'.$OUTPUT->pix_url('t/delete').'"></a>';
-                            } else {
-                                if ($inv->userid == $USER->id) {
-                                    // Accept pending invite if it's me.
-                                    $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $group->id, 'what' => 'accept', 'userid' => $inv->userid));
-                                    $this->content->text .= ' <a href="'.$manageurl.'"><img src="'.get_string('accept', 'block_teams').'"></a>';
-                                    $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $group->id, 'what' => 'decline', 'userid' => $inv->userid));
-                                    $this->content->text .= ' <a href="'.$manageurl.'"><img src="'.get_string('decline', 'block_teams').'"></a>';
-                                    $this->content->text .='<br/>';
-                                }
-                            }
-                        }
-                        $this->content->text .='<br/>';
-                    }
+                    // Render invites
+                    $invitecount = $this->renderer->front_user_invites($this, $team, $this->content->text);
+
+                    // Render your pending request in group
+                    $this->content->text .= $this->renderer->front_user_request($this, $team);
 
                     // Get max number of group members.
                     // Check if groupleader and if max number of group members has not been exceeded and print invite link.
@@ -136,17 +120,25 @@ class block_teams extends block_base {
                         $this->content->text .= '&rsaquo; <a href="'.$messageurl.'">'.get_string('messagegroup', 'block_teams').'</a><br/>';
                     }
 
-                    if (($i + $invitecount) == 1) {
-                        // Check if this is the only member left and display a remove membership and delete group option.
-                        $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $team->id, 'what' => 'removegroup'));
-                        $this->content->text .= '&rsaquo; <a href="'.$manageurl.'">'.get_string('deletegroup', 'block_teams').'</a><br/>';
-                    } elseif ($groupleader <> $USER->id) {
-                        $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $team->id, 'what' => 'delete', 'userid' => $USER->id));
-                        $this->content->text .= '&rsaquo; <a href="'.$manageurl.'">'.get_string('removemefromgroup', 'block_teams').'</a><br/>';
-                    } elseif ($groupleader == $USER->id && $i > 1) {
-                        if (has_capability('block/teams:transferownership', $coursecontext)) {
-                            $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $team->id, 'what' => 'transfer'));
-                            $this->content->text .= '&rsaquo; <a href="'.$manageurl.'">'.get_string('transferleadership', 'block_teams').'</a><br/>';
+                    if (teams_is_member($team)) {
+                        if (($i + $invitecount) == 1) {
+                            // Check if this is the only member left and display a remove membership and delete group option.
+                            $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $team->id, 'what' => 'removegroup'));
+                            $this->content->text .= '&rsaquo; <a href="'.$manageurl.'">'.get_string('deletegroup', 'block_teams').'</a><br/>';
+                        } elseif ($groupleader <> $USER->id) {
+                            $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $team->id, 'what' => 'delete', 'userid' => $USER->id));
+                            $this->content->text .= '&rsaquo; <a href="'.$manageurl.'">'.get_string('removemefromgroup', 'block_teams').'</a><br/>';
+                        } elseif ($groupleader == $USER->id && $i > 1) {
+                            if (has_capability('block/teams:transferownership', $coursecontext)) {
+                                $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $team->groupid, 'what' => 'transfer'));
+                                $this->content->text .= '&rsaquo; <a href="'.$manageurl.'">'.get_string('transferleadership', 'block_teams').'</a><br/>';
+                            }
+                        }
+                    } else {
+                        // If not member but can apply.
+                        if (teams_user_can_join($this->config, $team)) {
+                            $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $team->groupid, 'what' => 'joingroup'));
+                            $this->content->text .= '&rsaquo; <a href="'.$manageurl.'">'.get_string('jointeam', 'block_teams').'</a><br/>';
                         }
                     }
 
@@ -155,6 +147,11 @@ class block_teams extends block_base {
 
                 if (!empty($this->config->allowmultipleteams)) {
                     $this->content->text .= $this->renderer->user_invites($this, $USER->id, $COURSE->id);
+                }
+
+                if ($hasateamasleader && !empty($this->config->allowrequests)) {
+                    $this->content->text .= '<br/><br/>';
+                    $this->content->text .= $this->renderer->user_requests($this);
                 }
 
                 if (!empty($this->config->allowleadmultipleteams) || !$hasateamasleader) {
@@ -204,9 +201,9 @@ class block_teams extends block_base {
                 UPDATE
                     {block_teams}
                 SET
-                    open = 1
+                    openteam = 1
                 WHERE
-                    course = ?
+                    courseid = ?
             ";
             $DB->execute($sql, array($COURSE->id));
         }
@@ -216,9 +213,9 @@ class block_teams extends block_base {
                 UPDATE
                     {block_teams}
                 SET
-                    open = 0
+                    openteam = 0
                 WHERE
-                    course = ?
+                    courseid = ?
             ";
             $DB->execute($sql, array($COURSE->id));
         }

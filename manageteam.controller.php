@@ -28,22 +28,102 @@ $config = get_config('block_teams');
 
 /* ************************************* JOIN GROUP ****************************** */
 if ($action == 'joingroup') {
-    if ($COURSE->groupmode != NOGROUPS) {
-        $renderer = $PAGE->get_renderer('block_teams');
-        // If groupmode for this course is set to separate.
-        $groups = groups_get_all_groups($COURSE->id, $USER->id);
-        if (empty($groups)) {
-            // If user isn't in a Group - display invites and add group stuff.
-            echo $renderer->user_invites($USER->id, $COURSE->id);
-            echo $renderer->new_group_form($COURSE->id);
-            echo $OUTPUT->footer();
-            exit;
-        } else {
-            echo $OUTPUT->notification(get_string('alreadyinagroup', 'block_teams'));
-            echo $OUTPUT->continue_button($coursereturnurl);
-            echo $OUTPUT->footer();
-            exit;
+    // If groupmode for this course is set to separate.
+    if (teams_user_can_join($theblock->config, $team)) {
+        $request = new StdClass();
+        $request->courseid = $course->id;
+        $request->userid = $USER->id;
+        $request->groupid = $groupid;
+        $request->timemodified = time();
+        $DB->insert_record('block_teams_requests', $request);
+        echo $OUTPUT->notification(get_string('joinrequestposted', 'block_teams'));
+        echo $OUTPUT->continue_button($coursereturnurl);
+        echo $OUTPUT->footer();
+        exit;
+    } else {
+        echo $OUTPUT->notification(get_string('alreadyinagroup', 'block_teams'));
+        echo $OUTPUT->continue_button($coursereturnurl);
+        echo $OUTPUT->footer();
+        exit;
+    }
+
+/* ************************************* ACCEPT REJECT JOIN ****************************** */
+} elseif ($action == 'acceptjoin' || $action == 'rejectjoin'|| $action == 'rejectconfirm') {
+    // If groupmode for this course is set to separate.
+    // Check if this is a valid invite.
+
+    $request = $DB->get_record('block_teams_requests', array('userid' => $inviteuserid, 'courseid' => $courseid, 'groupid' => $groupid));
+    $team = $DB->get_record('block_teams', array('courseid' => $courseid, 'groupid' => $groupid));
+    if (empty($request)) {
+        print_error('errorinvalidrequest', 'block_teams');
+    }
+
+    // Security : check if user is the teamleader
+    if ($USER->id != $team->leaderid) {
+        print_error('errorbaduser', 'block_teams');
+    }
+
+    if ($action == 'rejectjoin') {
+        $deluser = $DB->get_record('user', array('id' => $inviteuserid));
+        $a = new StdClass();
+        $a->name = fullname($deluser);
+        $a->group = $group->name;
+        $params = array('id' => $blockid, 'groupid' => $groupid, 'userid' => $inviteuserid, 'what'=> 'rejectconfirm');
+        $confirmurl = new moodle_url('/blocks/teams/manageteam.php', $params);
+        echo $OUTPUT->confirm(get_string('rejectconfirm','block_teams', $a), $confirmurl, $coursereturnurl);
+        echo $OUTPUT->footer();
+        die;
+    } elseif ($action == 'rejectconfirm') {
+        // Delete invite by invited user. Leaders should not need to use.
+        $DB->delete_records('block_teams_requests', array('id' => $request->id));
+
+        // send e-mails.
+        // Notify leaders themselves of decline or acceptance.
+        teams_send_email($request->userid, $USER->id, $group, $action);
+
+        echo $OUTPUT->notification(get_string('requestrejected', 'block_teams'), 'notifysuccess');
+        echo $OUTPUT->continue_button(new moodle_url('/course/view.php', array('id' => $COURSE->id)));
+        echo $OUTPUT->footer();
+        die;
+    } else {
+        // Add this user to the group.
+        $newgroupmember = new stdClass;
+        $newgroupmember->groupid = $groupid;
+        $newgroupmember->userid = $request->userid;
+        $newgroupmember->timeadded = time();
+        if (!$DB->record_exists('groups_members', array('groupid' => $groupid, 'userid' => $request->userid))) {
+            $DB->insert_record('groups_members', $newgroupmember);
         }
+        // Delete this invite as processed.
+        $DB->delete_records('block_teams_requests', array('id' => $request->id));
+
+        // Now decline all other invites for this course if single team per user !
+        if (empty($theblock->config->allowmultipleteams)) {
+            $invites = $DB->get_records_select('block_teams_invites', " userid = ? AND courseid = ? ", array($USER->id, $courseid));
+            if (!empty($invites)) {
+                foreach ($invites as $invd) {
+                    // Notify invited user he is removed from other invite.
+                    teams_send_email($invd->userid, $USER->id, $group, 'deleteinvconfirm');
+                    // Notify extra leaders user he is removed from invite.
+                    teams_send_email($invd->leaderid, $invd->fromuserid, $group, 'deleteinvconfirm');
+                }
+                $DB->delete_records('block_teams_invites', array('userid' => $USER->id, 'courseid' => $courseid));
+            }
+
+            // Remove also any other unprocessed requests for this user.
+            $DB->delete_records('block_teams_requests', array('userid' => $request->userid, 'courseid' => $courseid));
+        }
+        echo $OUTPUT->notification(get_string('requestaccepted', 'block_teams'), 'notifysuccess');
+    }
+    // send e-mails.
+    // Notify user of acceptance.
+    teams_send_email($request->userid, $USER->id, $group, $action);
+
+    if ($USER->id == $inviteuserid) {
+        // Stop screen if an invited user use case. If team leader, let management screen continue.
+        echo $OUTPUT->continue_button(new moodle_url('/course/view.php', array('id' => $COURSE->id)));
+        echo $OUTPUT->footer();
+        die;
     }
 
 /* ************************************* CREATE GROUP ****************************** */
@@ -89,7 +169,7 @@ if ($action == 'joingroup') {
     $newteam->courseid = $course->id;
     $newteam->groupid = $groupid;
     $newteam->leaderid = $USER->id;
-    $newteam->open = $config->default_team_visibility;
+    $newteam->openteam = $config->default_team_visibility;
     if (!$DB->insert_record('block_teams', $newteam)) {
         print_error('errorregisterteam', 'block_teams');
     }
@@ -99,8 +179,8 @@ if ($action == 'joingroup') {
     $newgroupmember->groupid = $groupid;
     $newgroupmember->userid = $USER->id;
     $newgroupmember->timeadded = time();
-    if (!$groupid = $DB->insert_record('groups_members', $newgroupmember)) {
-        print_error('errorcouldnotassignmember', 'block_teams');
+    if (!$DB->record_exists('groups_members', array('groupid' => $groupid, 'userid' => $USER->userid))) {
+        $DB->insert_record('groups_members', $newgroupmember);
     }
 
     // If a special role assign needs to be added to user, add it
@@ -205,7 +285,9 @@ if ($action == 'joingroup') {
         $newgroupmember->groupid = $groupid;
         $newgroupmember->userid = $invite->userid;
         $newgroupmember->timeadded = time();
-        $DB->insert_record('groups_members', $newgroupmember);
+        if (!$DB->record_exists('groups_members', array('groupid' => $groupid, 'userid' => $invite->userid))) {
+            $DB->insert_record('groups_members', $newgroupmember);
+        }
         // Delete this invite as processed.
         $DB->delete_records('block_teams_invites', array('id' => $invite->id));
 

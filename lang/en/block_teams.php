@@ -18,6 +18,7 @@ $string['allowteamsiteinvite'] = 'Invite members from whole site';
 $string['alreadyinagroup'] = 'You are already in a team inside this course';
 $string['alreadyinvited'] = 'This user has already been invited to join one team';
 $string['alreadyinvitedtogroup'] = 'This user has already been invited to join the team';
+$string['allowrequests'] = 'Allow join requests to open groups';
 $string['backtocourse'] = 'Back to course';
 $string['blockname'] = 'Teams';
 $string['configdefaultteamvisibility'] = 'If checked, all teams are visible for everyone. if unchecked, users will only see teams they are member of or they are invited in';
@@ -60,6 +61,8 @@ $string['groupmembers'] = 'Current Team Members';
 $string['groupmessagesent'] = 'Team Messages Sent';
 $string['groupmodenotset'] = 'This block requires the course Group mode to be "separate" or "visible" at least';
 $string['groupname'] = 'Team name';
+$string['grouprequests'] ='Membership requests';
+$string['grouprequestsdesc'] ='You have join requests pending';
 $string['invalidinvite'] = 'invalid invite';
 $string['inviteaccepted'] = 'You have been added to this team';
 $string['inviteauser'] = 'Invite a user';
@@ -70,7 +73,9 @@ $string['inviteemailsubject'] = 'Team Invite';
 $string['invitegroupmembers'] = 'Invite team members';
 $string['invitesent'] = 'This user has been invited to join the team';
 $string['invitethisuser'] = 'Invite user';
-$string['joingroup'] = 'Join Team';
+$string['joinrequestposted'] = 'A requet to join has been sent to leaders.';
+$string['pendingrequest'] = '<i>Pending join request...</i>';
+$string['jointeam'] = 'Join Team';
 $string['leader'] = 'Leader';
 $string['localsettings'] = 'Local Settings';
 $string['lpmustbepublished'] = 'This course must be published to view teams';
@@ -85,12 +90,17 @@ $string['missingidnumber'] = 'Missing ID number';
 $string['nogroupset'] = 'You are not yet a member of a team on this course';
 $string['nogroupsetwarning'] = 'You must be a member of a team in this course';
 $string['noinvites'] = 'You have not been invited to join any existing teams';
+$string['norequests'] = 'You have no join requests pending in your leaded teams';
 $string['nouserfound'] = 'Could not find any user with those details';
 $string['pluginname'] = 'Teams';
-$string['removefromgroup'] = 'Are you sure you want to delete the user: {$a->name} from the team: {$a->group}';
+$string['reject'] = 'Reject';
+$string['rejectconfirm'] = 'Are you sure you want to reject the join request of {$a->name} in team {$a->group}?';
+$string['removefromgroup'] = 'Are you sure you want to delete the user: {$a->name} from the team: {$a->group}?';
 $string['removegroup'] = 'Are you sure you want to delete the team: {$a->group} - this will remove all existing members, and delete all team calendar events.';
 $string['removemefromgroup'] ='Remove me from this team';
 $string['revokeinvite'] = 'Delete this invite';
+$string['requestrejected'] = 'Join request rejected';
+$string['requestaccepted'] = 'Join request accepted';
 $string['searchforusers'] = 'Search for users';
 $string['searchforusersdesc'] = 'To find a user, you must add a filter using the form below. For more filter options press the "Show Advanced" button.';
 $string['selecttransferuser'] = 'Select an existing team member';
@@ -98,6 +108,7 @@ $string['sendingmessagetoteam'] = 'Sending message to team';
 $string['sendmessage'] = 'Send';
 $string['similarusers'] = 'Users with similar interests';
 $string['startmygroup'] = 'Start My Own Team';
+$string['team'] = 'Team';
 $string['teamgroup'] = 'Team: {$a}';
 $string['teamgroups'] = 'Teams';
 $string['teaminviteneedsacceptance'] = 'Enable invite acceptance';
@@ -119,6 +130,7 @@ $string['open'] = 'Team is visible';
 $string['closed'] = 'Team is private';
 $string['forceinvite'] = 'Force invite';
 $string['inviteforced'] = 'Invite has been forced in.';
+$string['jointeam'] = 'Join this team';
 
 $string['initiallyclosed'] = 'Initially private';
 $string['initiallyopen'] = 'Initially visible';
@@ -161,7 +173,20 @@ $string['deleteconfirmemailbody'] = 'Hi {$a->firstname},
 $string['deleteinvconfirmemailsubject'] = 'Teams / Invite deletion';
 $string['deleteinvconfirmemailbody'] = 'Hi {$a->firstname},
 
-The invite for {$a->user} to the Team "{$a->group}" in the course "{$a->course}" has been removed.';
+The invite for {$a->user} to the Team "{$a->group}" in the course "{$a->course}" has been removed.
+';
+
+$string['rejectconfirmemailsubject'] = 'Teams / Join request rejected.';
+$string['rejectconfirmemailbody'] = 'Hi {$a->firstname},
+
+Your request to join group "{$a->group}" in course "{$a->course}" has beed rejected.
+';
+
+$string['acceptjoinemailsubject'] = 'Demande d\'accès au groupe acceptée.';
+$string['acceptjoinemailbody'] = 'Bonjour {$a->firstname},
+
+Your request to join group "{$a->group}" in course <a href="{$a->courseurl}">"{$a->course}"</a> has been accepted. You are now member of the group.
+';
 
 $string['emailconfirmation'] = 'Hi {$a->firstname},
 
