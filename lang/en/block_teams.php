@@ -2,7 +2,6 @@
 
 // Capabilities
 $string['teams:addinstance'] = 'Can add an instance';
-$string['teams:myaddinstance'] = 'Can add an instance to my page';
 $string['teams:creategroup'] = 'Can create a team';
 $string['teams:transferownership'] = 'Can transfer ownership';
 $string['teams:apply'] = 'Can apply to an open team';

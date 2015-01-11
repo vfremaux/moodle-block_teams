@@ -2,7 +2,6 @@
 
 // Capabilities
 $string['teams:addinstance'] = 'Peut ajouter une instance';
-$string['teams:myaddinstance'] = 'Peut ajouter une instance à la page personnalisée';
 $string['teams:creategroup'] = 'Peut créer une équipe';
 $string['teams:transferownership'] = 'Peut donner le leadership';
 $string['teams:apply'] = 'Peut rejoindre une équipe';

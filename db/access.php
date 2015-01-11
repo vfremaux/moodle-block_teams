@@ -43,15 +43,6 @@ $capabilities = array(
         )
     ),
 
-    'block/teams:myaddinstance' => array(
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_BLOCK,
-        'legacy' => array(
-            'user' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        )
-    ),
-
     'block/teams:creategroup' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
