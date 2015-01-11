@@ -23,7 +23,7 @@ defined('MOODLE_INTERNAL') || die();
 class block_teams_renderer extends plugin_renderer_base {
 
     /**
-     * gets a list of group invites to display
+     * gets a list of group invites to display for a specific user
      *
      * @param int $userid userid of user
      * @param int $courseid courseid for course
@@ -49,9 +49,12 @@ class block_teams_renderer extends plugin_renderer_base {
                 if (empty($grpinv)) { //if empty, then this group doesn't exist so delete the invite!
                     $DB->delete_records('block_teams_invites', array('groupid' => $inv->groupid));
                 } else {
+                    $params = array('id' => $theblock->instance->id, 'groupid' => $inv->groupid, 'what' => 'accept');
+                    $accepturl = new moodle_url('/blocks/teams/manageteam.php', $params);
+                    $declineurl = $accepturl->param('what', 'decline');
                     $returntext .= '<div class="team-invite"><span class="team-groupname">'.$grpinv->name.'</span> '.
-                                   '<a href="'.$CFG->wwwroot.'/blocks/teams/manageteam.php?id='.$theblock->instance->id.'&groupid='.$inv->groupid.'&what=accept">'.get_string('accept','block_teams').'</a> | '.
-                                   '<a href="'.$CFG->wwwroot.'/blocks/teams/manageteam.php?id='.$theblock->instance->id.'&groupid='.$inv->groupid.'&what=decline">'.get_string('decline','block_teams').'</a>';
+                                   '<a href="'.$accepturl.'">'.get_string('accept','block_teams').'</a> | '.
+                                   '<a href="'.$declineurl.'">'.get_string('decline','block_teams').'</a>';
                    $returntext .= '</div>';
                 }
             }
@@ -59,6 +62,110 @@ class block_teams_renderer extends plugin_renderer_base {
             $returntext .= get_string('noinvites', 'block_teams');
         }
         return $returntext;
+    }
+
+    function front_user_invites(&$theblock, $team, &$str) {
+        global $DB, $OUTPUT, $USER, $COURSE;
+
+        $invites = $DB->get_records('block_teams_invites', array('groupid' => $team->id));
+        $invitecount = 0;
+        if (!empty($invites)) {
+            foreach ($invites as $inv) {
+                $invitecount++;
+                $inuser = $DB->get_record('user', array('id' => $inv->userid));
+                $userurl = new moodle_url('/user/view.php', array('id' => $inv->userid, 'course' => $COURSE->id));
+                $str .= '<div class="teams-invited"><a href="'.$userurl.'">'.fullname($inuser).'</a> ('.get_string('invited', 'block_teams').')</div>';
+                //show delete link
+                if ($groupleader == $USER->id) {
+                    // Delete pending invite.
+                    $params = array('id' => $theblock->instance->id, 'groupid' => $group->id, 'what' => 'deleteinv', 'userid' => $inv->userid);
+                    $manageurl = new moodle_url('/blocks/teams/manageteam.php', $params);
+                    $str .= ' <a href="'.$manageurl.'"><img src="'.$OUTPUT->pix_url('t/delete').'"></a>';
+                } else {
+                    if ($inv->userid == $USER->id) {
+                        // Accept pending invite if it's me.
+                        $params = array('id' => $theblock->instance->id, 'groupid' => $group->id, 'what' => 'accept', 'userid' => $inv->userid);
+                        $manageurl = new moodle_url('/blocks/teams/manageteam.php', $params);
+                        $str .= ' <a href="'.$manageurl.'"><img src="'.get_string('accept', 'block_teams').'"></a>';
+                        $manageurl->param('what', 'decline');
+                        $str .= ' <a href="'.$manageurl.'"><img src="'.get_string('decline', 'block_teams').'"></a>';
+                        $str .='<br/>';
+                    }
+                }
+            }
+            $str .='<br/>';
+        }
+        return $invitecount;
+    }
+
+    /**
+     * gets a list of group pending requests (all groups)
+     *
+     * @param int $userid userid of user
+     * @param int $courseid courseid for course
+     * @return string the HTML output
+     */
+    function user_requests(&$theblock, $courseid = 0) {
+        global $CFG, $DB, $USER, $COURSE;
+
+        if (!$courseid) {
+            $courseid = $COURSE->id;
+        }
+
+        // Check for requests.
+        $returntext = '<strong>'.get_string('grouprequests', 'block_teams') .':&nbsp;</strong><br/>';
+        $requests = teams_get_my_requests();
+        if (!empty($requests)) {
+            $groupnamemem = '';
+            $returntext .= get_string('grouprequestsdesc', 'block_teams').":";
+            $returntext .= '<div class="team-requests">';
+            foreach($requests as $req) {
+
+                // Cleanup if course group not exists anymore
+                $grp = $DB->get_record('groups', array('id' => $req->groupid));
+                if (empty($grp)) { //if empty, then this group doesn't exist so delete the invite!
+                    $DB->delete_records('block_teams_requests', array('groupid' => $req->groupid));
+                    $DB->delete_records('block_teams_invites', array('groupid' => $req->groupid));
+                    return '';
+                }
+
+                $params = array('id' => $theblock->instance->id, 'groupid' => $req->groupid, 'what' => 'acceptjoin', 'userid' => $req->userid);
+                $accepturl = new moodle_url('/blocks/teams/manageteam.php', $params);
+                $params = array('id' => $theblock->instance->id, 'groupid' => $req->groupid, 'what' => 'rejectjoin', 'userid' => $req->userid);
+                $rejecturl = new moodle_url('/blocks/teams/manageteam.php', $params);
+                if ($groupnamemem != $grp->name) {
+                    $returntext .= '<div class="team-request-team"><span class="team-groupname">'.$grp->name.'</span></div>';
+                    $groupnamemem = $grp->name;
+                }
+                $requser = $DB->get_record('user', array('id' => $req->userid));
+                $userurl = new moodle_url('/user/view.php', array('userid' => $req->userid, 'courseid' => $courseid));
+                $returntext .= '<div class="team-request"><span class="team-username"><a href="'.$userurl.'">'.fullname($requser).'</a></span>';
+                $returntext .= '<div class="team-line-cmd"><a href="'.$accepturl.'">'.get_string('accept','block_teams').'</a> | '.
+                               '<a href="'.$rejecturl.'">'.get_string('reject','block_teams').'</a></div>';
+                $returntext .= '</div>';
+            }
+            $returntext .= '</div>';
+        } else {
+            $returntext .= get_string('norequests', 'block_teams');
+        }
+        return $returntext;
+    }
+
+    function front_user_request(&$theblock, $team) {
+        global $DB, $USER, $OUTPUT;
+
+        $str = '';
+
+        if ($DB->get_records('block_teams_requests', array('groupid' => $team->id, 'userid' => $USER->id))) {
+            $str .= '<div class="team-pending-request">';
+            $str .= '<span class="team-pending-label">'.get_string('pendingrequest', 'block_teams').'</span>';
+            $params = array('id' => $theblock->instance->id, 'groupid' => $team->groupid, 'what' => 'removejoin');
+            $dismissurl = new moodle_url('/blocks/teams/manageteam.php', $params);
+            $str .= '<div class="team-line-cmd"><a href="'.$dismissurl.'" title="'.get_string('delete').'"><img src="'.$OUTPUT->pix_url('t/delete').'" /></a></div>';
+            $str .= '</div>';
+        }
+
+        return $str;
     }
 
     /**
@@ -120,14 +227,14 @@ class block_teams_renderer extends plugin_renderer_base {
 
         $team = $DB->get_record('block_teams', array('groupid' => $groupid));
 
-        if ($team->open == 1) {
-            if ($USER->id == $team->leaderid || has_capability('moodle/site/config', $systemcontext)) {
+        if ($team->openteam == 1) {
+            if ($USER->id == $team->leaderid || has_capability('moodle/site:config', $systemcontext)) {
                 $render = 'locklink';
             } else {
                 $render = 'unlockedicon';
             }
         } else {
-            if ($USER->id == $team->leaderid || has_capability('moodle/site/config', $systemcontext)) {
+            if ($USER->id == $team->leaderid || has_capability('moodle/site:config', $systemcontext)) {
                 $render = 'unlocklink';
             } else {
                 $render = 'lockedicon';
