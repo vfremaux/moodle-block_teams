@@ -46,7 +46,8 @@ function teams_get_teams($userid = 0) {
     $sql = "
         SELECT DISTINCT
             g.*,
-            t.leaderid
+            t.leaderid,
+            t.openteam
         FROM
             {groups} g,
             {groups_members} gm,
@@ -55,7 +56,7 @@ function teams_get_teams($userid = 0) {
             g.id = gm.groupid AND
             g.id = t.groupid AND
             (gm.userid = ?  OR
-               t.open = 1) AND
+               t.openteam = 1) AND
                t.courseid = ?
     ";
     return $DB->get_records_sql($sql, array($userid, $COURSE->id));
@@ -153,6 +154,7 @@ function teams_send_email($touserid, $fromuserid, $group, $action) {
     $a->firstname = $sendto->firstname;
     $a->user = fullname($sendfrom);
     $a->course = $COURSE->fullname;
+    $a->courseurl = new moodle_url('/course/view.php', array('id' => $COURSE->id));
     $a->group = $group->name;
 
     email_to_user($sendto, $sendfrom, get_string($action.'emailsubject','block_teams'), get_string($action.'emailbody', 'block_teams', $a));
@@ -194,4 +196,94 @@ function teams_date_format($date) {
         return '<span class="team-date-yellow">'.userdate($date).'</span>';
     }
     return '<span class="team-date-green">'.userdate($date).'</span>';
+}
+
+function teams_is_member($team) {
+    global $DB, $COURSE, $USER;
+    
+    $sql = "
+        SELECT
+            COUNT(*)
+        FROM
+            {groups_members} gm,
+            {groups} g
+        WHERE
+            g.id = gm.groupid AND
+            gm.userid = ? AND
+            g.courseid = ? AND
+            g.id = ?
+    ";
+
+    return($DB->count_records_sql($sql, array($USER->id, $COURSE->id, $team->groupid)));
+}
+
+/**
+ * Checks if user can join:
+ * - is not member of any group OR
+ * - can belong to multiple teams
+ */ 
+function teams_user_can_join(&$config, $team) {
+    global $USER, $COURSE, $DB;
+
+    $coursecontext = context_course::instance($COURSE->id);
+
+    if (!$team->openteam || !has_capability('block/teams:apply', $coursecontext) || empty($config->allowrequests)) {
+        return false;
+    }
+    
+    // If already has a request here go out
+    if ($DB->get_record('block_teams_requests', array('userid' => $USER->id, 'groupid' => $team->groupid))) {
+        return false;
+    }
+
+    if ($config->allowmultipleteams) {
+        return true;
+    }
+
+    // Fetch any course membership in groups associated to teams.
+    $sql = "
+        SELECT
+            COUNT(*)
+        FROM
+            {groups_members} gm,
+            {groups} g,
+            {block_teams} t
+        WHERE
+            g.id = gm.groupid AND
+            gm.userid = ? AND
+            t.groupid = g.groupid AND
+            t.courseid = ?
+    ";
+
+    if (!$DB->count_records_sql($sql, array($USER->id, $COURSE->id))) {
+        return true;
+    }
+
+    return false;
+}
+
+function teams_get_my_requests($courseid = 0, $userid = 0) {
+    global $DB, $COURSE, $USER;
+
+    if (!$courseid) {
+        $courseid = $COURSE->id;
+    }
+
+    if (!$userid) {
+        $userid = $USER->id;
+    }
+
+    $sql = "
+        SELECT
+            tr.*
+        FROM
+            {block_teams_requests} tr,
+            {block_teams} t
+        WHERE
+            tr.groupid = t.groupid AND
+            t.courseid = ? AND
+            t.leaderid = ?
+    ";
+
+    return $DB->get_records_sql($sql, array($courseid, $userid), 't.groupid');
 }

@@ -46,6 +46,8 @@ class block_teams_edit_form extends block_edit_form {
             $mform->setAdvanced('config_teamsiteinvite');
         }
 
+        $mform->addElement('advcheckbox', 'config_allowrequests', get_string('allowrequests', 'block_teams'), '', 1);
+
         $mform->addElement('advcheckbox', 'config_teaminviteneedsacceptance', get_string('teaminviteneedsacceptance', 'block_teams'));
         $mform->setDefault('config_teaminviteneedsacceptance', $config->invite_needs_acceptance);
         $mform->setAdvanced('config_teaminviteneedsacceptance');
