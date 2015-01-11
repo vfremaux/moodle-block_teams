@@ -205,30 +205,34 @@ if (isset($group->id) && empty($action) && ($team->leaderid == $USER->id) && (($
         if (empty($extrasql)) {
             // Don't bother to do any of the following unless a filter is already set!
             // Exclude users already in a team group inside this course.
-            $extrasql = "
-                id NOT IN (SELECT
+            if (empty($theblock->config->allowmultipleteams)) {
+                $extrasql = "
+                    id NOT IN (SELECT
+                                    userid
+                                  FROM
+                                      {groups_members} gm,
+                                      {groups} g,
+                                      {block_teams} t
+                                  WHERE
+                                      g.courseid = {$courseid} AND
+                                      g.id = gm.groupid AND
+                                      g.id = t.groupid)
+                ";
+                // Exclude users already invited.
+                $extrasql .= "
+                    AND id NOT IN ( SELECT
                                 userid
-                              FROM
-                                  {groups_members} gm,
-                                  {groups} g,
-                                  {block_teams} t
-                              WHERE
-                                  g.courseid = {$courseid} AND
-                                  g.id = gm.groupid AND
-                                  g.id = t.groupid)
-            ";
+                            FROM
+                                {block_teams_invites}
+                            WHERE
+                                courseid = {$courseid} AND
+                                groupid = {$groupid} )
+                ";
+            } else {
+                $extrasql = " 1 = 1 ";
+            }
 
-            // Exclude users already invited.
-            $extrasql .= "
-                AND id NOT IN ( SELECT
-                            userid
-                        FROM
-                            {block_teams_invites}
-                        WHERE
-                            courseid = {$courseid} AND
-                            groupid = {$groupid} )
-                {$userscopeclause}
-            ";
+            $extrasql .= $userscopeclause;
 
             $columns = array('firstname', 'lastname', 'city', 'country', 'lastaccess');
 

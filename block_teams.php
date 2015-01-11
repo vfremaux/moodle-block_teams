@@ -31,7 +31,7 @@ class block_teams extends block_base {
     }
 
     function applicable_formats() {
-        return array('all' => false, 'course' => true);
+        return array('all' => false, 'course' => true, 'my' => false);
     }
 
     function instance_allow_config() {

@@ -27,8 +27,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015011004;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2015011005;        // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2012120300;        // Requires this Moodle version
 $plugin->component = 'block_teams'; // Full name of the plugin (used for diagnostics)
-$plugin->release = '2.4.0 (Build 2015011004)';
+$plugin->release = '2.4.0 (Build 2015011005)';
 $plugin->maturity = MATURITY_RC;
