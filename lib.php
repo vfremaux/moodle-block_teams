@@ -20,7 +20,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  */
- 
+
 define('TEAMS_INITIAL_CLOSED', 0);
 define('TEAMS_INITIAL_OPEN', 1);
 define('TEAMS_FORCED_CLOSED', 2);
@@ -181,8 +181,83 @@ function teams_get_leader($groupid) {
 function teams_group_deleted($eventdata) {
     global $DB;
 
+    $deletedteam = $DB->get_record('block_teams', array('groupid' => $eventdata->objectid));
+
     $DB->delete_records('block_teams', array('groupid' => $eventdata->objectid));
     $DB->delete_records('block_teams_invites', array('groupid' => $eventdata->objectid));
+
+    // Remove leader role to team leader if no more lead after deletion.
+    if (!teams_get_leaded_teams($deletedteam->leaderid, $deletedteam->courseid, true)) {
+        $coursecontext = context_course::instance($deletedteam->courseid);
+        teams_remove_leader_role($deletedteam->leaderid, $coursecontext);
+    }
+}
+
+function teams_role_unassigned($eventdata) {
+    global $DB;
+
+    $config = get_config('block_teams');
+
+    $context = $DB->get_record('context', array('id' => $eventdata->contextid));
+    if ($context->contextlevel != CONTEXT_COURSE) return;
+    $courseid = $context->instanceid;
+
+    $sql = "
+        SELECT
+            g.*
+        FROM
+            {groups} g
+        JOIN
+            {groups_members} gm
+        ON
+            g.id = gm.groupid
+        WHERE
+            gm.userid = ? AND
+            g.courseid = ?
+    ";
+
+    if ($relatedgroups = $DB->get_records_sql($sql, array($eventdata->userid, $courseid))) {
+        foreach ($relatedgroups as $g) {
+            $team = $DB->get_record('block_teams', array('groupid' => $g->id));
+            if ($team->leaderid == $eventdata->userid) {
+                // Only discard if being the leader
+                $DB->set_field('block_teams', 'leaderid', 0, array('id' => $team->id));
+            }
+        }
+    }
+}
+
+function teams_role_assigned($eventdata) {
+    global $DB;
+
+    $config = get_config('block_teams');
+
+    $context = $DB->get_record('context', array('id' => $eventdata->contextid));
+    if ($context->contextlevel != CONTEXT_COURSE) return;
+    $courseid = $context->instanceid;
+
+    $sql = "
+        SELECT
+            g.id
+        FROM
+            {groups} g
+        JOIN
+            {groups_members} gm
+        ON
+            g.id = gm.groupid
+        WHERE
+            gm.userid = ? AND
+            g.courseid = ?
+    ";
+
+    if ($relatedgroups = $DB->get_records_sql($sql, array($eventdata->userid, $courseid))) {
+        foreach ($relatedgroups as $g) {
+            $team = $DB->get_record('block_teams', array('groupid' => $g->id));
+            $DB->set_field('block_teams', 'leaderid', $eventdata->userid, array('id' => $team->id));
+        }
+    }
+
+    // return true;
 }
 
 function teams_date_format($date) {
@@ -286,4 +361,153 @@ function teams_get_my_requests($courseid = 0, $userid = 0) {
     ";
 
     return $DB->get_records_sql($sql, array($courseid, $userid), 't.groupid');
+}
+
+function teams_get_leaded_teams($userid, $courseid = 0, $count = false) {
+    global $DB;
+
+    $params = array($userid);
+
+    if ($courseid) {
+        $courseclause = ' AND t.courseid = ? ';
+        $params[] = $courseid;
+    } else {
+        $courseclause = '';
+    }
+
+    if ($count) {
+        $sql = "
+            SELECT
+                COUNT(*)
+            FROM
+                {block_teams} t,
+                {groups} g
+            WHERE
+                t.leaderid = ? AND
+                t.groupid = g.id
+                {$courseclause}
+        ";
+        return $DB->count_records_sql($sql, $params);
+    } else {
+        $sql = "
+            SELECT
+                t.*
+            FROM
+                {block_teams} t,
+                {groups} g
+            WHERE
+                t.leaderid = ? AND
+                t.groupid = g.id
+                {$courseclause}
+        ";
+        return $DB->get_records_sql($sql, $params);
+    }
+}
+
+function teams_set_leader_role($userid, $context) {
+    global $DB;
+
+    $config = get_config('block_teams');
+
+    $empowered = false;
+    if ($oldrolesassigns = get_user_roles($context, $userid, false)) {
+        foreach ($oldrolesassigns as $ra) {
+            $archetype = $DB->get_field('role', 'archetype', array('shortname' => $ra->shortname));
+            if (in_array($archetype, array('teacher', 'editingteacher', 'coursecreator', 'manager'))) {
+                $empowered = true;
+            }
+        }
+    }
+
+    if ($empowered) return;
+
+    // Remove non leader role, whatever archetype it has.
+    if (!empty($config->non_leader_role)) {
+        if ($DB->record_exists('role', array('id' => $config->non_leader_role))) {
+            role_unassign($config->non_leader_role, $userid, $context->id);
+        } else {
+            // If role doees not exist anymore, just reset the setting peacefully.
+            set_config('non_leader_role', 0, 'block_teams');
+        }
+    }
+
+    // If a special role assign needs to be added to user, add it
+    if (!empty($config->leader_role)) {
+
+        if ($oldrolesassigns) {
+            foreach ($oldrolesassigns as $ra) {
+                // Only remove student like roles
+                $archetype = $DB->get_field('role', 'archetype', array('shortname' => $ra->shortname));
+                if (in_array($archetype, array('student', 'user'))) {
+                    role_unassign($ra->roleid, $userid, $context->id);
+                }
+            }
+        }
+
+        if ($DB->record_exists('role', array('id' => $config->leader_role))) {
+            role_assign($config->leader_role, $userid, $context->id);
+        } else {
+            // If role doees not exist anymore, just reset the setting peacefully.
+            set_config('leader_role', 0, 'block_teams');
+        }
+    }
+}
+
+/**
+ * Only processed unpowered roles, that is roles which archetype IS NOT
+ * any teacher or manager role.
+ * Removes any unpowered role that are archteyped to student or user and
+ * adds the non leader role if has been defined.
+ */
+function teams_remove_leader_role($userid, $context) {
+    global $DB;
+
+    $config = get_config('block_teams');
+
+    if ($oldrolesassigns = get_user_roles($context, $userid, false)) {
+
+        $empowered = false;
+        foreach ($oldrolesassigns as $ra) {
+            $archetype = $DB->get_field('role', 'archetype', array('shortname' => $ra->shortname));
+            if (in_array($archetype, array('teacher', 'editingteacher', 'coursecreator', 'manager'))) {
+                $empowered = true;
+            }
+        }
+    }
+
+    if ($empowered) return;
+
+    // Remove leader role, whatever archetype it has.
+    if (!empty($config->leader_role)) {
+        if ($DB->record_exists('role', array('id' => $config->leader_role))) {
+            role_unassign($config->leader_role, $userid, $context->id);
+        } else {
+            // If role does not exist anymore, just reset the setting peacefully.
+            set_config('leader_role', 0, 'block_teams');
+        }
+    }
+
+    // If a special role assign needs to be added to user, add it
+    if (!empty($config->non_leader_role)) {
+
+        // If has other non powered roles remaining on the way, remove them
+        if (!empty($oldrolesassigns)) {
+            foreach ($oldrolesassigns as $ra) {
+                // Only remove student like roles
+                if ($ra->roleid == $config->leader_role) continue; // already done.
+                $archetype = $DB->get_field('role', 'archetype', array('shortname' => $ra->shortname));
+                if (in_array($archetype, array('student', 'user'))) {
+                    role_unassign($ra->roleid, $userid, $context->id);
+                }
+            }
+        }
+
+        // Assign the non leader role.
+        if ($DB->record_exists('role', array('id' => $config->non_leader_role))) {
+            role_assign($config->non_leader_role, $userid, $context->id);
+        } else {
+            // If role does not exist anymore, just reset the setting peacefully.
+            set_config('non_leader_role', 0, 'block_teams');
+        }
+    }
 }

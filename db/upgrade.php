@@ -83,7 +83,9 @@ function xmldb_block_teams_upgrade($oldversion=0) {
         $field = new xmldb_field('open', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, null, 'leaderid');
 
         // Launch rename field openteam.
-        $dbman->rename_field($table, $field, 'openteam');
+        if ($dbman->field_exists($table, $index)) {
+            $dbman->rename_field($table, $field, 'openteam');
+        }
 
         upgrade_block_savepoint(true, 2015011104, 'teams');
     }

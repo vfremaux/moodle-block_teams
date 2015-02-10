@@ -67,11 +67,10 @@ $dir          = optional_param('dir', 'ASC', PARAM_ALPHA);
 $page         = optional_param('page', 0, PARAM_INT);
 $perpage      = optional_param('perpage', 30, PARAM_INT);        // how many per page
 
-if (! ($course = $DB->get_record('course', array('id' => $courseid))) ) {
+if (!($course = $DB->get_record('course', array('id' => $courseid))) ) {
     print_error('coursemisconf');
 }
 
-echo "course:$courseid";
 if (!empty($groupid) && !($group = $DB->get_record('groups', array('id' => $groupid, 'courseid' => $courseid)))) {
     print_error('invalidgroupid', 'block_teams');
 }
@@ -140,7 +139,7 @@ echo $OUTPUT->single_button(new moodle_url('/course/view.php', array('id' => $CO
 echo '</center><br/>';
 
 // Don't show invites or the ability to invite people as this is an accept/decline request.
-if (isset($group->id) && empty($action) && ($team->leaderid == $USER->id) && (($theblock->config->teamsmaxsize > count($grpmembers) || empty($theblock->config->teamsmaxsize)))) {
+if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->id) && (($theblock->config->teamsmaxsize > count($grpmembers) || empty($theblock->config->teamsmaxsize)))) {
     $invites = $DB->get_records('block_teams_invites', array('groupid' => $group->id));
     $invitecount = 0;
     echo $OUTPUT->box_start('generalbox');
