@@ -61,8 +61,11 @@ class block_teams_edit_form extends block_edit_form {
         $mform->setDefault('config_teamvisibility', $config->default_team_visibility);
         $mform->addHelpButton('config_teamvisibility', 'teamvisibility', 'block_teams');
 
-        $mform->addElement('text', 'config_teamsmaxsize', get_string('teamsmaxsize', 'block_teams'), 0 + $CFG->team_max_size_default);
+        $mform->addElement('text', 'config_teamsmaxsize', get_string('teamsmaxsize', 'block_teams'), 0 + @$CFG->team_max_size_default);
         $mform->setType('config_teamsmaxsize', PARAM_INT);
+
+        $mform->addElement('text', 'config_teamname', get_string('teamname', 'block_teams'), '');
+        $mform->setType('config_teamname', PARAM_INT);
     }
 
     public function set_data($defaults) {

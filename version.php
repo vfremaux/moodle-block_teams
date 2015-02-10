@@ -17,8 +17,7 @@
 /**
  * Version details
  *
- * @package    block
- * @subpackage teams
+ * @package    block_teams
  * version Moodle 2
  * @copyright  2014 Valery Fremaux (valery.fremaux@gmail.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,8 +26,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015011005;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2013101800;        // Requires this Moodle version
+$plugin->version   = 2015011108;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2012120300;        // Requires this Moodle version
 $plugin->component = 'block_teams'; // Full name of the plugin (used for diagnostics)
-$plugin->release = '2.6.0 (Build 2015011005)';
+$plugin->release = '2.6.0 (Build 2015011108)';
 $plugin->maturity = MATURITY_RC;

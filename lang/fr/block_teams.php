@@ -2,182 +2,201 @@
 
 // Capabilities
 $string['teams:addinstance'] = 'Peut ajouter une instance';
+$string['teams:manageteams'] = 'Peut gérer les équipes';
 $string['teams:creategroup'] = 'Peut créer une équipe';
 $string['teams:transferownership'] = 'Peut donner le leadership';
 $string['teams:apply'] = 'Peut rejoindre une équipe';
 
-//groups stuff
+// Teams stuff.
 
 $string['accept'] = 'Accepter';
 $string['acceptinvite'] = 'Etes-vous certain d\'accepter cette invitation';
 $string['allowleadmultipleteams'] = 'Autoriser un utilisateur à gérer plusieurs équipes';
 $string['allowmultipleteams'] = 'Autoriser un utilisateur à être membre de plusieurs équipes';
+$string['allowrequests'] = 'Autoriser les demandes spontanées aux équipes ouverts';
 $string['allowteamsiteinvite'] = 'Inviter des utilisateurs du site';
 $string['alreadyinagroup'] = 'Vous êtes déjà dans une équipe du cours';
 $string['alreadyinvited'] = 'Cet utilisateur est déjà invité à rejoindre une équipe';
 $string['alreadyinvitedtogroup'] = 'Cet utilisateur est déjà invité à rejoindre cette équipe';
-$string['allowrequests'] = 'Autoriser les demandes spontanées aux groupes ouverts';
 $string['backtocourse'] = 'Revenir au cours';
 $string['blockname'] = 'Equipes';
+$string['buildteam'] = 'Monter une équipe avec ce leader';
+$string['changeleaderto'] = 'Choisir comme leader';
 $string['closed'] = 'Equipe privée';
 $string['closeteam'] = 'Rendre l\'équipe privée';
-$string['configdefaultteaminviteneedsacceptance'] = 'Si activé, une invitation doit être acceptée par l\'invité. Si inactif, l\'utilisateur invité est directement ajouté comme membre actif du groupe. Ce réglage définit la valeur par défaut pour tout nouveau bloc "Equipes" implanté dans le cours.';
+$string['configdefaultteaminviteneedsacceptance'] = 'Si activé, une invitation doit être acceptée par l\'invité. Si inactif, l\'utilisateur invité est directement ajouté comme membre actif de l\'équipe. Ce réglage définit la valeur par défaut pour tout nouveau bloc "Equipes" implanté dans le cours.';
 $string['configdefaultteamvisibility'] = 'si coché, les équipes créées sont visibles de tous les utilisateurs. sinon les utilisateurs ne voient que les équipes dont ils sont membres ou auxquelles ils sont invités';
-$string['configteamleaderrole'] = 'S\'il est défini, tout leader d\'un groupe aura une assignation à ce role en plus de celles qu\'il possède déjà dans le cours';
+$string['confignonteamleaderrole'] = 'S\'il est défini, il s\'agit du rôle attribué à toute personne ayant perdu tout leadership dans le cours.';
+$string['configteamleaderrole'] = 'S\'il est défini, tout leader d\'une équipe aura une assignation à ce role en plus de celles qu\'il possède déjà dans le cours';
 $string['configteamsiteinvite'] = 'Si activé, alors il sera possible pour l\'enseignant de laisser les membres inviter des participants depuis tout le site';
-$string['confirmdeclineemailsubject'] = 'Invitation au groupe rejettée';
-$string['createnewgroup'] = 'Créer un nouveau groupe de travail';
-$string['createnewgroupdesc'] = 'Après la création d\'un groupe, vous en devenez le leader et pouvez inviter d\'autres utilisateurs.';
+$string['confirmdeclineemailsubject'] = 'Invitation à l\'équipe rejettée';
+$string['createnewgroup'] = 'Créer une nouvelle équipe';
+$string['createnewgroupdesc'] = 'Après la création d\'une équipe, vous en devenez le leader et pouvez inviter d\'autres utilisateurs.';
 $string['decline'] = 'Refuser';
 $string['declineinvite'] = 'Etes-vous certain de refuser cette invitation';
 $string['defaultteaminviteneedsacceptance'] = 'Acceptation des invitations';
 $string['defaultteamvisibility'] = 'Visibilité de l\'équipe par défaut';
-$string['deletegroup'] = 'Supprimer ce groupe';
+$string['deletegroup'] = 'Supprimer cette équipe';
 $string['deletemember'] = 'Révoquer ce membre';
 $string['emailconfirmsent'] = 'Un courriel d\'invitation a été normalement envoyé à  <b>{$a}</b>';
 $string['errorbaduser'] = 'L\'utilisateur courant n\'est pas concerné par cette invitation';
-$string['errorcouldnotassignmember'] = 'Impossible d\'ajouter une assignation de groupe';
-$string['errordeleteleader'] = 'Vous êtes leader de l\'équipe. Vous ne pouvez pas vous retirer de ce groupe avant d\'avoir transmis votre leadership à quelqu\'un d\'autre !';
-$string['erroremptygroupname'] = 'Le groupe doit avoir un nom';
-$string['errorinvalidgroupid'] = 'Groupe invalide';
+$string['errorcouldnotassignmember'] = 'Impossible d\'ajouter une assignation à l\'équipe';
+$string['errordeleteleader'] = 'Vous êtes leader de l\'équipe. Vous ne pouvez pas vous retirer de cette équipe avant d\'avoir transmis votre leadership à quelqu\'un d\'autre !';
+$string['erroremptygroupname'] = 'L\'équipe doit avoir un nom';
+$string['errorinvalidgroupid'] = 'Equipe invalide';
 $string['errorinvalidinvite'] = 'Invitation invalide';
 $string['forcedclosed'] = 'Toujours privées';
 $string['forcedopen'] = 'Toujours visibles';
 $string['forceinvite'] = 'Forcer l\'invitation';
-$string['groupcreated'] = 'Groupe créé';
-$string['groupdeleted'] = 'Groupe supprimé';
-$string['groupexists'] = 'Un groupe existant porte déjà ce nom. Veuillez en donner un aute.';
+$string['groupcreated'] = 'Equipe créé';
+$string['groupdeleted'] = 'Equipe supprimé';
+$string['groupexists'] = 'Un équipe existant porte déjà ce nom. Veuillez en donner un autre.';
 $string['groupfull'] = 'Le nombre maximum d\'utilisateurs par équipe a été atteint. Vous ne pouvez plus inviter d\'autres utilisateurs.';
 $string['groupinvites'] = 'Invitations dans l\'équipe';
 $string['groupinvitesdesc'] = 'Vous avez été invité dans les équipes suivantes';
-$string['groupmax'] = 'Taille max. du groupe';
-$string['groupmaxdesc'] = 'Ceci est le nombre maximal d\'utilisateurs autorisés à rejoindre la même équipe dans un cours. Une valeur inférieure au nombre d\'utilisateurs actuellement présents ne changera pas la composition des groupes, mais empêchera toute nouvelle entrée.';
+$string['groupmax'] = 'Taille max. du équipe';
+$string['groupmaxdesc'] = 'Ceci est le nombre maximal d\'utilisateurs autorisés à rejoindre la même équipe dans un cours. Une valeur inférieure au nombre d\'utilisateurs actuellement présents ne changera pas la composition des équipes, mais empêchera toute nouvelle entrée.';
 $string['groupmembers'] = 'Membres de l\'équipe';
 $string['groupmessagesent'] = 'Message envoyé à l\'équipe';
 $string['groupmodenotset'] = 'Ce bloc nécessite que le cours soit configuré en "groupes séparés" ou au moins en "groupes visibles"';
-$string['groupname'] = 'Nom du groupe/équipe';
+$string['groupname'] = 'Nom de l\'équipe';
 $string['grouprequests'] = 'Demandes de particpation';
 $string['grouprequestsdesc'] = 'Vous avez des demandes d\'accès';
-$string['rejectconfirm'] = 'Etes-vous sûr de vouloir rejetter la demande d\'accès de {$a->name} au groupe : {$a->group}';
 $string['initiallyclosed'] = 'Initiallement privées';
 $string['initiallyopen'] = 'Initiallement visibles';
 $string['inviteaccepted'] = 'Vous avez été ajouté(e) à l\'équipe';
 $string['inviteauser'] = 'Inviter un utilisateur';
 $string['invited'] = 'Invité';
 $string['invitedeclined'] = 'Vous avez décliné cette invitation';
-$string['invitedeleted'] = 'Invitation au groupe de travail supprimé';
-$string['inviteemailsubject'] = 'Invitation à un groupe de travail dans un cours';
+$string['invitedeleted'] = 'Invitation dans l\'équipe supprimé';
+$string['inviteemailsubject'] = 'Invitation à rejoindre une équipe dans un cours';
 $string['inviteforced'] = 'L\'invitation a été confirmée';
 $string['invitegroupmembers'] = 'Inviter d\'autres utilisateurs';
-$string['invitesent'] = 'Cet utilisateur est invité à rejoindre un groupe';
+$string['invitesent'] = 'Cet utilisateur est invité à rejoindre une équipe';
 $string['invitethisuser'] = 'Inviter cet utilisateur';
+$string['joinrequestposted'] = 'Vous avez demandé à rejoindre l\'équipe.';
 $string['jointeam'] = 'Rejoindre l\'équipe';
-$string['joinrequestposted'] = 'Vous avez demandé à rejoindre le groupe.';
-$string['pendingrequest'] = '<i>Demande en cours...</i>';
 $string['leader'] = 'Leader';
+$string['leaderchanged'] = 'Le leader de l\'équipe {$a->groupname} est maintenant {$a->username}';
 $string['localsettings'] = 'Réglages locaux';
 $string['lpmustbepublished'] = 'Ce cours doit être publiée avant de pouvoir voir les équipes et leurs membres';
-$string['manageteamgroup'] = 'Gérer le groupe/équipe';
+$string['manageteamgroup'] = 'Gérer l\'équipe';
 $string['memberadded'] = 'Le membre a été rajouté';
 $string['memberdeleted'] = 'L\'utilisateur a été retiré de l\'équipe';
+$string['members'] = 'Membres';
 $string['message'] = 'Message';
 $string['messagegroup'] = 'Envoyer un message à tous les membres de l\'équipe';
 $string['messagenorecipients'] = 'Désolé, aucun utilisateur ne correspond à vos critères de sélection';
 $string['missingidnumber'] = 'ID manquant';
-$string['nogroupset'] = 'Vous n\'êtes pas encore membre d\'un groupe de travail dans ce cours';
-$string['nogroupsetwarning'] = 'Vous devez être membre du groupe de travail dans ce cours';
+$string['nogroupset'] = 'Vous n\'êtes pas encore membre d\'une équipe dans ce cours';
+$string['nogroupsetwarning'] = 'Vous devez être membre d\'une équipe dans ce cours';
 $string['noinvites'] = 'Vous n\'avez pas d\'invitation en cours';
+$string['nonteamleaderrole'] = 'Rôle des non leaders';
 $string['norequests'] = 'Vous n\'avez pas de demandes en cours';
 $string['nouserfound'] = 'Pas d\'utilisateur avec ces propriétés';
 $string['open'] = 'Equipe visible';
 $string['openteam'] = 'Ouvrir la visibilité de l\'équipe';
+$string['pendingrequest'] = '<i>Demande en cours...</i>';
 $string['pluginname'] = 'Equipes';
-$string['removefromgroup'] = 'Etes-vous sûr(e) de vouloir supprimer cet utilisateur : {$a->name} du groupe : {$a->group}';
-$string['removegroup'] = 'Etes-vous sûr(e) de vouloir supprimer ce groupe : {$a->group} - ceci supprimera tous les enregistrements de membres, ainsi que tous les événements de calendrier associés.';
-$string['removemefromgroup'] = 'Me retirer du groupe';
-$string['requestrejected'] = 'Demande d\'accès au groupe de travail rejettée';
-$string['requestaccepted'] = 'Demande d\'accès au groupe de travail validée';
 $string['reject'] = 'Rejetter';
+$string['rejectconfirm'] = 'Etes-vous sûr de vouloir rejetter la demande d\'accès de {$a->name} à l\équipe : {$a->group}';
+$string['removefromgroup'] = 'Etes-vous sûr(e) de vouloir supprimer cet utilisateur : {$a->name} de l\'équipe : {$a->group}';
+$string['removegroup'] = 'Etes-vous sûr(e) de vouloir supprimer cette équipe : {$a->group}.';
+$string['removemefromgroup'] = 'Me retirer de l\'équipe';
+$string['requestaccepted'] = 'Demande d\'accès a l\'équipe validée';
+$string['requestrejected'] = 'Demande d\'accès a l\'équipe rejettée';
 $string['revokeinvite'] = 'Supprimer cette invitation';
 $string['searchforusers'] = 'Chercher des utilisateurs';
 $string['searchforusersdesc'] = 'Pour trouver une personne, ajoutez des filtres grâce au formulaire ci-dessous. Pour plus d\'options de filtrage, cliquez sur le bouton "Paramètres supplémentaires".';
 $string['selecttransferuser'] = 'Choisir un membre';
-$string['sendingmessagetoteam'] = 'Message au groupe';
+$string['sendingmessagetoteam'] = 'Message à l\'équipe';
 $string['similarusers'] = 'Utilisateurs partageant les mêmes centres d\'intérêt';
-$string['startmygroup'] = 'Démarrer mon propre groupe';
+$string['startmygroup'] = 'Démarrer ma propre équipe';
 $string['team'] = 'Equipe ';
-$string['teamgroup'] = 'Groupe de travail : {$a}';
-$string['teamgroups'] = 'Groupes de travail';
+$string['teambuilt'] = 'Une nouvelle équipe a été construite pour le groupe {$a}.';
+$string['teamdeleted'] = 'L\'équipe {$a} a été supprimée.';
+$string['teamgroup'] = 'Equipe : {$a}';
+$string['teamgroups'] = 'Equipes';
 $string['teaminviteneedsacceptance'] = 'Acceptation des invitations';
-$string['teamleaderrole'] = 'Role additionnel du leader';
+$string['teamleaderrole'] = 'Rôle additionnel du leader';
 $string['teammaxsizedefault'] = 'Taille maximale par défaut des équipes';
-$string['teamsmaxsize'] = 'Taille maximale des équipes (leader inclus)';
+$string['teamname'] = 'Nom d\'équipe';
 $string['teamsiteinvite'] = 'Inviter tous les utilisateurs';
+$string['teamsmaxsize'] = 'Taille maximale des équipes (leader inclus)';
+$string['teamsoverview'] = 'Vue d\'ensemble';
 $string['teamvisibility'] = 'Visibilité des équipes';
 $string['transferconfirmed'] = 'Le leadership a été transféré';
 $string['transferleadership'] = 'Transférer le leadership';
 $string['transferto'] = 'Transférer le leadership à ';
-$string['transferuser'] = 'Etes-vous sûr(e) de vouloir transférer le leadership du groupe : {$a->group}, à l\'utilisateur : {$a->user}';
-$string['useralreadyingroup'] = 'Cet utilisateur est déjà membre d\'un groupe dans ce cours ';
+$string['transferuser'] = 'Etes-vous sûr(e) de vouloir transférer le leadership de l\'équipe : {$a->group}, à l\'utilisateur : {$a->user}';
+$string['unteamedgroups'] = 'Groupes sans équipes';
+$string['useralreadyingroup'] = 'Cet utilisateur est déjà membre d\'une équipe dans ce cours ';
 
 /* Messages */
 
-$string['inviteemailsubject'] = 'Invitation à un groupe';
+$string['inviteemailsubject'] = 'Invitation à rejoindre une équipe';
 $string['inviteemailbody'] = 'Bonjour, {$a->firstname},
 
-je vous invite dans le groupe &quot;{$a->group}&quot; du cours &quot;{$a->course}&quot;, utilisez le lien suivant pour plus de détails
+je vous invite dans l\'équipe &quot;{$a->group}&quot; du cours &quot;{$a->course}&quot;, utilisez le lien suivant pour plus de détails
 {$a->link}
 ';
 
-$string['addmemberemailsubject'] = 'Ajout à un groupe';
+$string['addmemberemailsubject'] = 'Ajout à une équipe';
 $string['addmemberemailbody'] = 'Bonjour, {$a->firstname},
 
-je vous ai ajouté dans mon groupe &quot;{$a->group}&quot; du cours &quot;{$a->course}&quot;, utilisez le lien suivant pour plus de détails
+je vous ai ajouté dans mon équipe &quot;{$a->group}&quot; du cours &quot;{$a->course}&quot;, utilisez le lien suivant pour plus de détails
 {$a->link}
 ';
 
-$string['deleteconfirmemailsubject'] = 'Départ du groupe';
+$string['deleteconfirmemailsubject'] = 'Départ de l\'équipe';
 
-$string['confirmedeclinemailsubject'] = 'Départ du groupe';
+$string['confirmedeclinemailsubject'] = 'Départ de l\'équipe';
 $string['confirmdeclineemailbody'] = 'Bonjour {$a->firstname},
 
-{$a->user} a décliné votre invitation à se joindre au groupe &quot;{$a->group}&quot; dans le cours &quot;{$a->course}&quot;
+{$a->user} a décliné votre invitation à se joindre à l\'équipe &quot;{$a->group}&quot; dans le cours &quot;{$a->course}&quot;
 ';
 
-$string['confirmacceptemailsubject'] = 'Invitation au groupe acceptée';
+$string['deleteselfinvemailsubject'] = 'Annulation d\'invitation';
+$string['deleteselfinvemailbody'] = 'Bonjour {$a->firstname},
+
+L\'invitation pour {$a->user} dans l\'équipe "{$a->group}" dans le cours "{$a->course}" a été supprimée par 
+votre invité suite à une autre action de sa part.
+';
+
+$string['confirmacceptemailsubject'] = 'Invitation à l\'équipe acceptée';
 $string['confirmacceptemailbody'] = 'Bonjour {$a->firstname},
 
-{$a->user} a accepté votre invitation à se joindre au groupe "{$a->group}" dans le cours "{$a->course}"
+{$a->user} a accepté votre invitation à se joindre à l\'équipe "{$a->group}" dans le cours "{$a->course}"
 ';
 
-$string['deleteconfirmemailsubject'] = 'Départ du groupe';
+$string['deleteconfirmemailsubject'] = 'Départ de l\'équipe';
 $string['deleteconfirmemailbody'] = 'Bonjour {$a->firstname},
 
-{$a->user} est sorti du groupe "{$a->group}" dans le cours "{$a->course}"
+{$a->user} est sorti de l\'équipe "{$a->group}" dans le cours "{$a->course}"
 ';
 
 $string['transferconfirmemailsubject'] = 'Equipes : Transfert du leadership';
 $string['transferconfirmemailbody'] = 'Bonjour {$a->firstname},
 
-Le leadership du groupe "{$a->group}" dans le cours "{$a->course}" a été transféré à "{$a->user}".
+Le leadership de l\'équipe "{$a->group}" dans le cours "{$a->course}" a été transféré à "{$a->user}".
 ';
 
-$string['deleteinvconfirmemailsubject'] = 'Invitation au groupe supprimée';
+$string['deleteinvconfirmemailsubject'] = 'Invitation à l\'équipe supprimée';
 $string['deleteinvconfirmemailbody'] = 'Bonjour {$a->firstname},
 
-L\'invitation de {$a->user} à rejoindre le groupe "{$a->group}" dans le cours "{$a->course}" a été retirée.
+L\'invitation de {$a->user} à rejoindre l\'équipe "{$a->group}" dans le cours "{$a->course}" a été retirée.
 ';
 
-$string['rejectconfirmemailsubject'] = 'Demande d\'accès au groupe rejettée.';
+$string['rejectconfirmemailsubject'] = 'Demande d\'accès à l\'équipe rejettée.';
 $string['rejectconfirmemailbody'] = 'Bonjour {$a->firstname},
 
-Votre demande de rejoindre le groupe "{$a->group}" dans le cours "{$a->course}" a été rejettée.
+Votre demande de rejoindre l\'équipe "{$a->group}" dans le cours "{$a->course}" a été rejettée.
 ';
 
-$string['acceptjoinemailsubject'] = 'Demande d\'accès au groupe acceptée.';
+$string['acceptjoinemailsubject'] = 'Demande d\'accès à l\'équipe acceptée.';
 $string['acceptjoinemailbody'] = 'Bonjour {$a->firstname},
 
-Votre demande de rejoindre le groupe "{$a->group}" dans le cours <a href="{$a->courseurl}">"{$a->course}"</a> a été acceptée. Vous faites désormais partie du groupe.
+Votre demande de rejoindre l\'équipe "{$a->group}" dans le cours <a href="{$a->courseurl}">"{$a->course}"</a> a été acceptée. Vous faites désormais partie de l\'équipe.
 ';
 
 $string['emailconfirmation'] = 'Bonjour {$a->firstname},
@@ -205,7 +224,7 @@ Cette section liste les utilisateurs auxquels le leader de l\'équipe a envoyé 
 ';
 
 $string['teamvisibility_help'] = '
-Les équipes peuvent être privées ou visibles. Ce réglage définit comment sont créées les équipes, et si leur visibilit peut être changée ou non :
+Les équipes peuvent être privées ou visibles. Ce réglage définit comment sont créées les équipes, et si leur visibilité peut être changée ou non :
 
 * Initiallement privé : Les équipes créées sont privées, mais les leaders peuvent changer cet état et rendre une équipe publique.
 * Initiallement public : Les équipes créées sont visibles, mais les leaders peuvent changer cet état et fermer la visibilité d\'une équipe.
@@ -216,5 +235,5 @@ Les équipes peuvent être privées ou visibles. Ce réglage définit comment so
 $string['teaminviteneedsacceptance_help'] = '
 Si l\'acceptation des invitations est requise (défaut), alors une invitation doit être acceptée explicitement par son destinataire pour prendre effet.
 
-Si cette fonction eest désactivée, les leaders de groupes peuvent directement ajouter des membres sans avoir la conoformation de ceux-ci.
+Si cette fonction eest désactivée, les leaders d\'équipe peuvent directement ajouter des membres sans avoir la conoformation de ceux-ci.
 ';

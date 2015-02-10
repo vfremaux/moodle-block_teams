@@ -20,6 +20,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  */
+require_once($CFG->dirroot.'/group/lib.php');
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -137,8 +138,8 @@ if ($action == 'joingroup') {
 
     $groups = groups_get_all_groups($courseid, $USER->id);
 
-    if (!empty($groups) && !empty($theblock->config->allowmultipleteams)) {
-        // User is already can member of a group, and block config fobids multiple teams.
+    if (!empty($groups) && empty($theblock->config->allowmultipleteams)) {
+        // User is already member of a group, and block config forbids multiple teams.
         echo $OUTPUT->notification(get_string('alreadyinagroup', 'block_teams'));
         echo $OUTPUT->continue_button($coursereturnurl);
         echo $OUTPUT->footer();
@@ -160,9 +161,7 @@ if ($action == 'joingroup') {
     $newgroup->timecreated = time();
     $newgroup->timemodified = time();
     $newgroup->courseid = $courseid;
-    if (!$groupid = $DB->insert_record('groups', $newgroup)) {
-        print_error('errorcreategroup', 'block_teams');
-    }
+    $groupid = groups_create_group($newgroup);
 
     // Register team aside to group record.
     $newteam = new stdClass;
@@ -179,19 +178,27 @@ if ($action == 'joingroup') {
     $newgroupmember->groupid = $groupid;
     $newgroupmember->userid = $USER->id;
     $newgroupmember->timeadded = time();
-    if (!$DB->record_exists('groups_members', array('groupid' => $groupid, 'userid' => $USER->userid))) {
+    if (!$DB->record_exists('groups_members', array('groupid' => $groupid, 'userid' => $USER->id))) {
         $DB->insert_record('groups_members', $newgroupmember);
     }
 
-    // If a special role assign needs to be added to user, add it
-    if (!empty($config->leader_role)) {
-        if ($DB->record_exists('role', array('id' => $config->leader_role))) {
-            $coursecontext = context_course::instance($course->id);
-            role_assign($config->leader_role, $USER->id, $coursecontext->id);
-        } else {
-            // If role doees not exist anymore, just reset the setting peacefully.
-            set_config('leader_role', 0, 'block_teams');
+    $coursecontext = context_course::instance($COURSE->id);
+    teams_set_leader_role($USER->id, $coursecontext);
+
+    if (empty($theblock->config->allowmultipleteams)) {
+        // We need remove all other invites we have
+        $invites = $DB->get_records('block_teams_invites', array('userid' => $USER->id, 'courseid' => $COURSE->id));
+        if ($invites) {
+            foreach($invites as $invite) {
+                $DB->delete_records('block_teams_invites', array('id' => $invite->id));
+                // Notify group leader regarding deletion.
+                $team = $DB->get_record('block_teams', array('groupid' => $invite->groupid));
+                teams_send_email($team->leaderid, $USER->id, $newgroup, 'deleteselfinv');
+            }
         }
+
+        // We need remove all other requests we have posted
+        $DB->delete_records('block_teams_requests', array('userid' => $USER->id));
     }
 
     echo $OUTPUT->notification(get_string('groupcreated', 'block_teams'), 'notifysuccess');
@@ -206,7 +213,7 @@ if ($action == 'joingroup') {
     // Show confirmation page.
     $deleteuser = required_param('userid', PARAM_INT);
 
-    //allow users to delete their own assignment as long as they aren't the team leader, and allow team leaders to delete other assignments
+    // Allow users to delete their own assignment as long as they aren't the team leader, and allow team leaders to delete other assignments.
     if (($USER->id == $deleteuser && $team->leaderid <> $deleteuser) || ($team->leaderid == $USER->id && $deleteuser <> $USER->id)) {
 
         if ($action == 'delete' or $action == 'deleteinv') {
@@ -217,8 +224,7 @@ if ($action == 'joingroup') {
             $params = array('id' => $blockid, 'groupid' => $groupid, 'userid' => $deleteuser, 'what'=> $action.'confirm');
             $confirmurl = new moodle_url('/blocks/teams/manageteam.php', $params);
             echo $OUTPUT->confirm(get_string('removefromgroup','block_teams', $a), $confirmurl, $coursereturnurl);
-
-        } elseif($action == 'deleteconfirm') {
+        } elseif ($action == 'deleteconfirm') {
             $DB->delete_records('groups_members', array('groupid' => $group->id, 'userid' => $deleteuser));
 
             // Notify group leader (me?) regarding deletion.
@@ -228,7 +234,7 @@ if ($action == 'joingroup') {
 
             echo $OUTPUT->notification(get_string('memberdeleted', 'block_teams'), 'notifysuccess');
             echo $OUTPUT->continue_button($coursereturnurl);
-        } elseif($action == 'deleteinvconfirm') {
+        } elseif ($action == 'deleteinvconfirm') {
             $invite = $DB->get_record('block_teams_invites', array('groupid' => $group->id, 'userid' => $deleteuser));
             $DB->delete_records('block_teams_invites', array('groupid' => $group->id, 'userid' => $deleteuser));
             // Notify inviter regarding deletion.
@@ -264,7 +270,7 @@ if ($action == 'joingroup') {
 } elseif ($action == 'confirmaccept' or $action == 'confirmdecline') {
     // Check if this is a valid invite.
 
-    $invite = $DB->get_record('block_teams_invites', array('userid' => $inviteuserid, 'courseid' => $courseid, 'groupid' => $groupid));
+    $invite = $DB->get_record('block_teams_invites', array('userid' => $inviteuserid, 'groupid' => $groupid));
     if (empty($invite)) {
         print_error('errorinvalidinvite', 'block_teams');
     }
@@ -299,9 +305,12 @@ if ($action == 'joingroup') {
                     // Notify invited user he is removed from other invite
                     teams_send_email($invd->userid, $USER->id, $group, 'deleteinvconfirm');
                     // Notify extra leaders user he is removed from invite
-                    teams_send_email($invd->leaderid, $invd->fromuserid, $group, 'deleteinvconfirm');
+                    $leaderid = $DB->get_field('block_teams', 'leaderid', array('groupid' => $invd->groupid));
+                    teams_send_email($leaderid, $invd->userid, $group, 'deleteinvconfirm');
                 }
                 $DB->delete_records('block_teams_invites', array('userid' => $USER->id, 'courseid' => $courseid));
+
+                $DB->delete_records('block_teams_requests', array('userid' => $USER->id, 'courseid' => $courseid));
             }
         }
         if ($USER->id == $inviteuserid) {
@@ -347,10 +356,18 @@ if ($action == 'joingroup') {
             die;
         } elseif ($action == 'removegroupconfirm') {
             // Remove this user from the group and delete the group.
-            require_once($CFG->dirroot.'/group/lib.php');
             groups_delete_group($groupid);
             // Event bound team and team invites deletion
             // @see /blocks/teams/lib.php§teams_group_deleted()
+
+            // temporary : delete team here
+            $DB->delete_records('block_teams', array('groupid' => $groupid));
+
+            // Remove leader role if unique group
+            if (!teams_get_leaded_teams($USER->id, $COURSE->id, true)) {
+                $coursecontext = context_course::instance($COURSE->id);
+                teams_remove_leader_role($USER->id, $coursecontext);
+            }
 
             // Remove team side record and get out from management.
             echo $OUTPUT->notification(get_string('groupdeleted', 'block_teams'),'notifysuccess');
@@ -401,10 +418,19 @@ if ($action == 'joingroup') {
                $userid = required_param('userid', PARAM_INT);
                $team->leaderid = $userid;
                $DB->update_record('block_teams', $team);
+
+                $coursecontext = context_course::instance($COURSE->id);
+                teams_set_leader_role($userid, $coursecontext);
+
+                // Remove leader role if no more leaded groups.
+                if (!teams_get_leaded_teams($USER->id, $COURSE->id, true)) {
+                    teams_remove_leader_role($USER->id, $coursecontext);
+                }
+
                //now e-mail new group leader regarding transfer
                teams_send_email($team->leaderid, $USER->id, $group, $action);  //email group leader.
 
-               echo $OUTPUT->notification(get_string('transferconfirmed', 'block_teams'),'notifysuccess');
+               echo $OUTPUT->notification(get_string('transferconfirmed', 'block_teams'), 'notifysuccess');
                echo $OUTPUT->continue_button($coursereturnurl);
            }
        } else {
