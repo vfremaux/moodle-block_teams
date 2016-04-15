@@ -16,7 +16,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package moodlecore
+ * @package block_teams
+ * @category blocks
  * @subpackage backup-moodle2
  * @copyright 2003 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -34,7 +35,8 @@ class backup_teams_block_structure_step extends backup_block_structure_step {
     protected function define_structure() {
         global $DB;
 
-        $userinfo = $this->get_setting_value('userinfo');
+        // TODO : check how to get this information
+        // $userinfo = $this->get_setting_value('userinfo');
 
         // Get the block.
         $block = $DB->get_record('block_instances', array('id' => $this->task->get_blockid()));
@@ -45,7 +47,7 @@ class backup_teams_block_structure_step extends backup_block_structure_step {
         // Define each element separated.
 
         $teams = new backup_nested_element('teams');
-        $team = new backup_nested_element('team', array('id'), array('groupid', 'leaderid', 'open'));
+        $team = new backup_nested_element('team', array('id'), array('courseid', 'groupid', 'leaderid', 'openteam'));
 
         // Build the tree.
 
@@ -53,14 +55,13 @@ class backup_teams_block_structure_step extends backup_block_structure_step {
 
         // Define sources.
 
-        if ($userinfo) {
-            $team->set_source_table('block_teams',
-                                     array('courseid' => $this->task->get_courseid()));
-        }
+        // if ($userinfo) {
+            $team->set_source_table('block_teams', array('courseid' => backup::VAR_COURSEID));
+        // }
 
         // ID Annotations (none).
-        $team->annotate_ids('leaderid', 'userid');
-        $team->annotate_ids('groupid', 'groupid');
+        $team->annotate_ids('user', 'leaderid');
+        $team->annotate_ids('group', 'groupid');
 
         // Annotations (files).
 

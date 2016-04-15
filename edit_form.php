@@ -14,14 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * @package    block_teams
+ * @category   blocks
  * @author     Valery Fremaux
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  */
-
-defined('MOODLE_INTERNAL') || die();
 
 class block_teams_edit_form extends block_edit_form {
 
@@ -61,8 +62,11 @@ class block_teams_edit_form extends block_edit_form {
         $mform->setDefault('config_teamvisibility', $config->default_team_visibility);
         $mform->addHelpButton('config_teamvisibility', 'teamvisibility', 'block_teams');
 
-        $mform->addElement('text', 'config_teamsmaxsize', get_string('teamsmaxsize', 'block_teams'), 0 + $CFG->team_max_size_default);
+        $mform->addElement('text', 'config_teamsmaxsize', get_string('teamsmaxsize', 'block_teams'), 0 + @$CFG->team_max_size_default);
         $mform->setType('config_teamsmaxsize', PARAM_INT);
+
+        $mform->addElement('text', 'config_teamname', get_string('teamname', 'block_teams'), '');
+        $mform->setType('config_teamname', PARAM_INT);
     }
 
     public function set_data($defaults) {

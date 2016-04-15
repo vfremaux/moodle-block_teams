@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,20 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * Version details
- *
- * @package    block_teams
- * @category   blocks
- * @copyright  2014 Valery Fremaux (valery.fremaux@gmail.com)
+ * @package    block
+ * @subpackage block_teams
+ * @copyright  2010 onwards Valery Fremaux {valery.fremaux@club-internet.fr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author Valery Fremaux (valery.fremaux@gmail.com)
  */
 
-$plugin->version   = 2015011108;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2012120300;        // Requires this Moodle version
-$plugin->component = 'block_teams'; // Full name of the plugin (used for diagnostics)
-$plugin->release = '2.7.0 (Build 2015011108)';
-$plugin->maturity = MATURITY_STABLE;

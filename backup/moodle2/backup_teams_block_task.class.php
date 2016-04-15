@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -18,7 +17,7 @@
 require_once 'backup_teams_stepslib.php';
 
 /**
- * @package moodlecore
+ * @package block_teams
  * @subpackage backup-moodle2
  * @copyright 2003 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -45,7 +44,7 @@ class backup_teams_block_task extends backup_block_task {
     }
 
     public function get_configdata_encoded_attributes() {
-        return array('config_text_nomatch', 'config_text_all'); // We need to encode some attrs in configdata
+        return array('text_nomatch', 'text_all'); // We need to encode some attrs in configdata
     }
 
     static public function encode_content_links($content) {

@@ -59,3 +59,8 @@ team-shadowed {
 .team-request-team .team-groupname{
     font-size:0.8em;
 }
+
+.block_teams.block .footer {
+    padding-top:10px;
+    font-size:0.9em;
+}

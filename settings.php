@@ -14,9 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * @package    block_teams
- * @author     Valery Fremaux
+ * @category   blocks
+ * @author     Valery Fremaux (valery.fremaux@gmail.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  */
@@ -51,3 +54,6 @@ foreach ($roles as $rid => $role) {
 
 $settings->add(new admin_setting_configselect('block_teams/leader_role', get_string('teamleaderrole', 'block_teams'),
                    get_string('configteamleaderrole', 'block_teams'), 0, $rolemenu, PARAM_INT));
+
+$settings->add(new admin_setting_configselect('block_teams/non_leader_role', get_string('nonteamleaderrole', 'block_teams'),
+                   get_string('confignonteamleaderrole', 'block_teams'), 0, $rolemenu, PARAM_INT));

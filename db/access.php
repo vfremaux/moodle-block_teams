@@ -30,9 +30,21 @@
 //
 // For the core capabilities, the variable is $moodle_capabilities.
 
+defined('MOODLE_INTERNAL') || die();
+
 $capabilities = array(
 
     'block/teams:addinstance' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'legacy' => array(
+            'editingteacher' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+
+    'block/teams:manageteams' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'legacy' => array(
