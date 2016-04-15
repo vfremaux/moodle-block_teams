@@ -16,7 +16,6 @@
 
 /**
  * @package    block_teams
- * @category   blocks
  * @author     Valery Fremaux
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
