@@ -51,3 +51,6 @@ foreach ($roles as $rid => $role) {
 
 $settings->add(new admin_setting_configselect('block_teams/leader_role', get_string('teamleaderrole', 'block_teams'),
                    get_string('configteamleaderrole', 'block_teams'), 0, $rolemenu, PARAM_INT));
+
+$settings->add(new admin_setting_configselect('block_teams/non_leader_role', get_string('nonteamleaderrole', 'block_teams'),
+                   get_string('confignonteamleaderrole', 'block_teams'), 0, $rolemenu, PARAM_INT));

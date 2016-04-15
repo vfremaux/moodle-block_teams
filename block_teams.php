@@ -51,7 +51,7 @@ class block_teams extends block_base {
         $this->content->items = array();
         $this->content->icons = array();
         $this->content->footer = '';
-        
+
         if (empty($this->config)) {
             $this->config = new StdClass();
             $this->config->teamsmaxsize = 0;
@@ -59,6 +59,7 @@ class block_teams extends block_base {
 
         $this->content->text = '';
 
+        $context = context_block::instance($this->instance->id);
         $coursecontext = context_course::instance($COURSE->id);
 
         $action = optional_param('what', '', PARAM_TEXT);
@@ -79,6 +80,8 @@ class block_teams extends block_base {
                     $this->content->text .= get_string('nogroupset', 'block_teams') . '<br/>';
                 } else {
                     $this->content->text .= $this->renderer->new_group_form($this);
+                    $this->content->text .= '<br/>';
+                    $this->content->text .= '<br/>';
                     $this->content->text .= $this->renderer->user_invites($this, $USER->id, $COURSE->id);
                 }
             } else {
@@ -96,10 +99,10 @@ class block_teams extends block_base {
                     $groupleader = $DB->get_record('user', array('id' => $team->leaderid));
                     $this->content->text .= '<div class="team-instance">';
                     $this->content->text .= '<div class="team-status-indicator">'.$this->renderer->private_state($this, $team->id).'</div>';
-                    $this->content->text .= "<strong>".get_string('group').":</strong> ".$team->name."<br/>";
+                    $this->content->text .= "<strong>".get_string('team', 'block_teams').":</strong> ".$team->name."<br/>";
 
                     // Render group members
-                    $i = $this->renderer->team_members($team, $this->content->text);
+                    $i = $this->renderer->team_members($team, $this->content->text, $this->instance->id);
 
                     // Render invites
                     $invitecount = $this->renderer->front_user_invites($this, $team, $this->content->text);
@@ -121,14 +124,16 @@ class block_teams extends block_base {
                     }
 
                     if (teams_is_member($team)) {
-                        if (($i + $invitecount) == 1) {
+                        if (($i) == 1 && ($groupleader->id == $USER->id)) {
                             // Check if this is the only member left and display a remove membership and delete group option.
                             $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $team->id, 'what' => 'removegroup'));
                             $this->content->text .= '&rsaquo; <a href="'.$manageurl.'">'.get_string('deletegroup', 'block_teams').'</a><br/>';
-                        } elseif ($groupleader <> $USER->id) {
+                        }
+                        if ($groupleader->id <> $USER->id) {
                             $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $team->id, 'what' => 'delete', 'userid' => $USER->id));
                             $this->content->text .= '&rsaquo; <a href="'.$manageurl.'">'.get_string('removemefromgroup', 'block_teams').'</a><br/>';
-                        } elseif ($groupleader == $USER->id && $i > 1) {
+                        }
+                        if (($groupleader->id == $USER->id) && $i > 1) {
                             if (has_capability('block/teams:transferownership', $coursecontext)) {
                                 $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $this->instance->id, 'groupid' => $team->groupid, 'what' => 'transfer'));
                                 $this->content->text .= '&rsaquo; <a href="'.$manageurl.'">'.get_string('transferleadership', 'block_teams').'</a><br/>';
@@ -164,7 +169,12 @@ class block_teams extends block_base {
                 $this->content->text = get_string('groupmodenotset', 'block_teams');
             }
         }
+
         $this->content->footer = '';
+        if (has_capability('block/teams:manageteams', $context)) {
+            $manageurl = new moodle_url('/blocks/teams/manageteams.php', array('id' => $this->instance->id));
+            $this->content->footer = '<center><a href="'.$manageurl.'">'.get_string('teamsoverview', 'block_teams').'</a></center>';
+        }
 
         return $this->content;
     }
@@ -197,27 +207,11 @@ class block_teams extends block_base {
         }
 
         if ($data->teamvisibility == TEAMS_FORCED_OPEN) {
-            $sql = "
-                UPDATE
-                    {block_teams}
-                SET
-                    openteam = 1
-                WHERE
-                    courseid = ?
-            ";
-            $DB->execute($sql, array($COURSE->id));
+            $DB->set_field('block_teams', 'openteam', 1, array('courseid' => $COURSE-id));
         }
 
         if ($data->teamvisibility == TEAMS_FORCED_CLOSED) {
-            $sql = "
-                UPDATE
-                    {block_teams}
-                SET
-                    openteam = 0
-                WHERE
-                    courseid = ?
-            ";
-            $DB->execute($sql, array($COURSE->id));
+            $DB->set_field('block_teams', 'openteam', 0, array('courseid' => $COURSE-id));
         }
 
        parent::instance_config_save($data, $nolongerused);

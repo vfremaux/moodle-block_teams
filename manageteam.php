@@ -50,6 +50,13 @@ if (!$theblock = block_instance('teams', $instance)) {
     print_error('errorbadblockinstance', 'block_teams');
 }
 
+if (empty($theblock->config->teamsmaxsize)) {
+    if (!isset($theblock->config)) {
+        $theblock->config = new StdClass();
+    }
+    $theblock->config->teamsmaxsize = 0;
+}
+
 require_login();
 
 $courseid = $context->instanceid;
@@ -67,11 +74,10 @@ $dir          = optional_param('dir', 'ASC', PARAM_ALPHA);
 $page         = optional_param('page', 0, PARAM_INT);
 $perpage      = optional_param('perpage', 30, PARAM_INT);        // how many per page
 
-if (! ($course = $DB->get_record('course', array('id' => $courseid))) ) {
+if (!($course = $DB->get_record('course', array('id' => $courseid))) ) {
     print_error('coursemisconf');
 }
 
-echo "course:$courseid";
 if (!empty($groupid) && !($group = $DB->get_record('groups', array('id' => $groupid, 'courseid' => $courseid)))) {
     print_error('invalidgroupid', 'block_teams');
 }
@@ -140,7 +146,7 @@ echo $OUTPUT->single_button(new moodle_url('/course/view.php', array('id' => $CO
 echo '</center><br/>';
 
 // Don't show invites or the ability to invite people as this is an accept/decline request.
-if (isset($group->id) && empty($action) && ($team->leaderid == $USER->id) && (($theblock->config->teamsmaxsize > count($grpmembers) || empty($theblock->config->teamsmaxsize)))) {
+if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->id) && (($theblock->config->teamsmaxsize > count($grpmembers) || empty($theblock->config->teamsmaxsize)))) {
     $invites = $DB->get_records('block_teams_invites', array('groupid' => $group->id));
     $invitecount = 0;
     echo $OUTPUT->box_start('generalbox');
@@ -183,12 +189,15 @@ if (isset($group->id) && empty($action) && ($team->leaderid == $USER->id) && (($
         echo '<p>'.get_string('searchforusersdesc','block_teams').'</p>';
 
         // Print search form
+        $sqlparams = array();
+        $userscopeparams = array();
 
         $userscopeclause = '';
         if (empty($theblock->config->allowsiteinvite)) {
             if ($courseusers = get_enrolled_users($context)) {
-                $courseuserlist = implode('","', array_keys($courseusers));
-                $userscopeclause = ' AND id IN ("'.$courseuserlist.'") ';
+
+                list($sql, $userscopeparams) = $DB->get_in_or_equal(array_keys($courseusers), SQL_PARAMS_NAMED, 'param3');
+                $userscopeclause = ' AND id '.$sql;
             } else {
                 // Trap out all possible results, no users in course !
                 $userscopeclause =  ' AND 1 = 0 ';
@@ -201,38 +210,57 @@ if (isset($group->id) && empty($action) && ($team->leaderid == $USER->id) && (($
         $ufiltering = new user_filtering(array('realname' => 0, 'lastname' => 1, 'firstname' => 1, 'email' => 0, 'city' => 1, 'country' => 1,
                             'profile' => 1, 'mnethostid' => 1), null, array('id' => $blockid, 'groupid' => $groupid, 'perpage' => $perpage, 'page' => $page, 'sort' => $sort, 'dir' => $dir));
         list($extrasql, $params) = $ufiltering->get_sql_filter();
+        $sqlparams = $sqlparams + $params;
 
         if (empty($extrasql)) {
             // Don't bother to do any of the following unless a filter is already set!
             // Exclude users already in a team group inside this course.
             if (empty($theblock->config->allowmultipleteams)) {
-                $extrasql = "
-                    id NOT IN (SELECT
-                                    userid
-                                  FROM
-                                      {groups_members} gm,
-                                      {groups} g,
-                                      {block_teams} t
-                                  WHERE
-                                      g.courseid = {$courseid} AND
-                                      g.id = gm.groupid AND
-                                      g.id = t.groupid)
+                $sql2 = "
+                    SELECT
+                        userid,
+                        userid
+                    FROM
+                        {groups_members} gm,
+                        {groups} g,
+                        {block_teams} t
+                    WHERE
+                        g.courseid = ? AND
+                        g.id = gm.groupid AND
+                        g.id = t.groupid
                 ";
+                $alreadygrouped = $DB->get_records_sql($sql2, array($courseid));
+
+                list($insql, $params) = $DB->get_in_or_equal(array_keys($alreadygrouped), SQL_PARAMS_NAMED, 'param1', false);
+                $sqlparams = $sqlparams + $params;
+                
+                $extrasql = ' id '.$insql;
+
                 // Exclude users already invited.
-                $extrasql .= "
-                    AND id NOT IN ( SELECT
-                                userid
-                            FROM
-                                {block_teams_invites}
-                            WHERE
-                                courseid = {$courseid} AND
-                                groupid = {$groupid} )
+                $sql2 = "
+                    SELECT
+                        userid
+                    FROM
+                        {block_teams_invites}
+                    WHERE
+                        courseid = ? AND
+                        groupid = ?
                 ";
+                if ($alreadyinvited = $DB->get_records_sql($sql2, array($courseid, $groupid))) {
+
+                    list($extrasql2, $params) = $DB->get_in_or_equal(array_keys($alreadyinvited), SQL_PARAMS_NAMED, 'param2', false);
+                    $sqlparams = $sqlparams + $params;
+    
+                    $extrasql .= "
+                        AND $extrasql2
+                    ";
+                }
             } else {
                 $extrasql = " 1 = 1 ";
             }
 
             $extrasql .= $userscopeclause;
+            $sqlparams = $sqlparams + $userscopeparams;
 
             $columns = array('firstname', 'lastname', 'city', 'country', 'lastaccess');
 
@@ -247,12 +275,12 @@ if (isset($group->id) && empty($action) && ($team->leaderid == $USER->id) && (($
                     }
                 } else {
                     $columndir = $dir == 'ASC' ? 'DESC':'ASC';
-                    if ($column == "lastaccess") {
+                    if ($column == 'lastaccess') {
                         $columnicon = $dir == 'ASC' ? 'up':'down';
                     } else {
                         $columnicon = $dir == 'ASC' ? 'down':'up';
                     }
-                    $columnicon = ' <img src="'.$OUTPUT->pix_url("/t/$columnicon").'" alt="" />';
+                    $columnicon = ' <img src="'.$OUTPUT->pix_url('/t/$columnicon').'" alt="" />';
 
                 }
                 $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $blockid, 'groupid' => $groupid, 'sort' => $column, 'dir' => $columndir));
@@ -263,8 +291,9 @@ if (isset($group->id) && empty($action) && ($team->leaderid == $USER->id) && (($
                 $sort = 'firstname';
             }
 
-            $users = get_users_listing($sort, $dir, $page*$perpage, $perpage, '', '', '', $extrasql, $params, $context);
-            $usersearchcount = get_users(false, '', true, array(), '', '', '', '', '', '*', $extrasql, $params,$context);
+            // Finally actually fetch the users.
+            $users = get_users_listing($sort, $dir, $page*$perpage, $perpage, '', '', '', $extrasql, $sqlparams, $context);
+            $usersearchcount = get_users(false, '', true, array(), '', '', '', '', '', '*', $extrasql, $sqlparams, $context);
 
             $strall = get_string('all');
 
