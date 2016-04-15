@@ -16,7 +16,8 @@
 
 /**
  * @package    block_teams
- * @author     Valery Fremaux
+ * @category   blocks
+ * @author     Valery Fremaux (valery.fremaux@gmail.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  *
@@ -56,6 +57,8 @@ if (empty($theblock->config->teamsmaxsize)) {
     }
     $theblock->config->teamsmaxsize = 0;
 }
+
+// Security.
 
 require_login();
 
