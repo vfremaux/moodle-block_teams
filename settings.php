@@ -14,9 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * @package    block_teams
- * @author     Valery Fremaux
+ * @category   blocks
+ * @author     Valery Fremaux (valery.fremaux@gmail.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  */

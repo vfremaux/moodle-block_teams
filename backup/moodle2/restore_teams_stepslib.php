@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,10 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package moodlecore
+ * @package    block_teams
+ * @category   blocks
  * @subpackage backup-moodle2
- * @copyright 2003 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2003 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
@@ -50,12 +50,6 @@ class restore_teams_block_structure_step extends restore_structure_step {
 
         // Nothing to do yet here.
     }
-
-    /*
-    // We cannot do anything with that.
-    public function process_teams($data) {
-    }
-    */
 
     /*
     *
