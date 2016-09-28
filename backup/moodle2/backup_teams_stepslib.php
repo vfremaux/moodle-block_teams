@@ -16,7 +16,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package moodlecore
+ * @package block_teams
+ * @category blocks
  * @subpackage backup-moodle2
  * @copyright 2003 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -59,8 +60,8 @@ class backup_teams_block_structure_step extends backup_block_structure_step {
         // }
 
         // ID Annotations (none).
-        $team->annotate_ids('leaderid', 'userid');
-        $team->annotate_ids('groupid', 'groupid');
+        $team->annotate_ids('user', 'leaderid');
+        $team->annotate_ids('group', 'groupid');
 
         // Annotations (files).
 
