@@ -70,8 +70,10 @@ $capabilities = array(
         )
     ),
 
-    // Users having this capability will be able to apply to open teams
-    // even if having not been invited
+    /*
+     * Users having this capability will be able to apply to open teams
+     * even if having not been invited
+     */
     'block/teams:apply' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,

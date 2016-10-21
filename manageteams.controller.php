@@ -83,7 +83,7 @@ if ($action == 'buildteam') {
             teams_remove_leader_role($m->id, $coursecontext);
         }
     }
-    
+
     $a = new StdClass();
     $a->groupname = $group->name;
     $resultmessage = $OUTPUT->notification(get_string('teambuilt', 'block_teams', $a), 'success');

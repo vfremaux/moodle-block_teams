@@ -83,7 +83,7 @@ foreach ($teams as $t) {
     $othermembers = '';
     if ($members = groups_get_members($t->groupid,  'u.id,'.get_all_user_name_fields(true, 'u'))) {
         $others = array();
-        foreach($members as $m) {
+        foreach ($members as $m) {
             if ($m->id != $t->leaderid) {
                 $params = array('id' => $id,
                                 'what' => 'changeleader',
@@ -125,7 +125,11 @@ if ($unteamedgroups) {
         if ($members = groups_get_members($g->id,  'u.id,'.get_all_user_name_fields(true, 'u'))) {
             $others = array();
             foreach ($members as $m) {
-                $params = array('id' => $id, 'what' => 'buildteam', 'groupid' => $g->id, 'leaderid' => $m->id, 'sesskey' => sesskey());
+                $params = array('id' => $id,
+                                'what' => 'buildteam',
+                                'groupid' => $g->id,
+                                'leaderid' => $m->id,
+                                'sesskey' => sesskey());
                 $maketeamurl = new moodle_url('/blocks/teams/manageteams.php', $params);
                 $title = get_string('buildteam', 'block_teams');
                 $pix = '<img src="'.$OUTPUT->pix_url('i/users').'">';

@@ -43,9 +43,8 @@ class restore_teams_block_structure_step extends restore_structure_step {
     }
 
     public function process_block($data) {
-        global $DB;
-
         // Nothing to do yet here.
+        return;
     }
 
     /**
@@ -55,12 +54,11 @@ class restore_teams_block_structure_step extends restore_structure_step {
         global $DB;
 
         $data  = (object) $data;
-        $oldid = $data->id;
 
         $data->courseid = $this->task->get_courseid();
         $data->leaderid = $this->get_mappingid('user', $data->leaderid);
         $data->groupid = $this->get_mappingid('groups', $data->groupid);
 
-        $ruleid = $DB->insert_record('block_teams', $data);
+        $DB->insert_record('block_teams', $data);
     }
 }

@@ -22,7 +22,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once 'backup_teams_stepslib.php';
+require_once($CFG->dirroot.'/blocks/teams/backup/moodle2/backup_teams_stepslib.php');
 
 /**
  * Specialised backup task for the html block

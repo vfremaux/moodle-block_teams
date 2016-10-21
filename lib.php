@@ -21,6 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  */
+defined('MOODLE_INTERNAL') || die();
 
 define('TEAMS_INITIAL_CLOSED', 0);
 define('TEAMS_INITIAL_OPEN', 1);
@@ -41,8 +42,6 @@ function teams_get_teams($userid = 0) {
     if (!$groups = groups_get_all_groups($COURSE->id, $userid)) {
         return false;
     }
-
-    $groupids = implode(',', array_keys($groups));
 
     $sql = "
         SELECT DISTINCT
@@ -71,7 +70,7 @@ function teams_get_teams($userid = 0) {
  * @param object $group the course
  */
 function teams_send_invite(&$theblock, $userid, $fromuserid, $group) {
-    global $CFG, $COURSE, $DB, $OUTPUT;
+    global $COURSE, $DB, $OUTPUT;
 
     $params = array('courseid' => $COURSE->id, 'userid' => $userid, 'groupid' => $group->id);
     if ($DB->record_exists('block_teams_invites', $params)) {
@@ -102,7 +101,7 @@ function teams_send_invite(&$theblock, $userid, $fromuserid, $group) {
 
         message_post_message($sendfrom, $sendto, get_string('inviteemailbody', 'block_teams', $a), FORMAT_HTML, 'direct');
 
-        echo $OUTPUT->notification(get_string('invitesent', 'block_teams'),'notifysuccess');
+        echo $OUTPUT->notification(get_string('invitesent', 'block_teams'), 'notifysuccess');
     }
 }
 
@@ -114,7 +113,7 @@ function teams_send_invite(&$theblock, $userid, $fromuserid, $group) {
  * @param object $group the course
  */
 function teams_add_member(&$theblock, $userid, $fromuserid, $group) {
-    global $CFG, $COURSE, $DB, $OUTPUT;
+    global $COURSE, $DB, $OUTPUT;
 
     $newgroupmember = new stdClass;
     $newgroupmember->groupid = $group->id;
@@ -135,7 +134,7 @@ function teams_add_member(&$theblock, $userid, $fromuserid, $group) {
 
     message_post_message($sendfrom, $sendto, get_string('addmemberemailbody', 'block_teams', $a), FORMAT_HTML, 'direct');
 
-    echo $OUTPUT->notification(get_string('memberadded', 'block_teams'),'notifysuccess');
+    echo $OUTPUT->notification(get_string('memberadded', 'block_teams'), 'notifysuccess');
 }
 
 /**
@@ -150,7 +149,7 @@ function teams_send_email($touserid, $fromuserid, $group, $action) {
     global $COURSE, $DB;
 
     $sendto = $DB->get_record('user', array('id' => $touserid));
-    $sendfrom = $DB->get_record('user',array('id' => $fromuserid));
+    $sendfrom = $DB->get_record('user', array('id' => $fromuserid));
 
     $a = new stdclass();
     $a->firstname = $sendto->firstname;
@@ -159,7 +158,7 @@ function teams_send_email($touserid, $fromuserid, $group, $action) {
     $a->courseurl = new moodle_url('/course/view.php', array('id' => $COURSE->id));
     $a->group = $group->name;
 
-    $subject = get_string($action.'emailsubject','block_teams');
+    $subject = get_string($action.'emailsubject', 'block_teams');
     email_to_user($sendto, $sendfrom, $subject, get_string($action.'emailbody', 'block_teams', $a));
 }
 
@@ -211,7 +210,7 @@ function teams_is_member($team) {
  * Checks if user can join:
  * - is not member of any group OR
  * - can belong to multiple teams
- */ 
+ */
 function teams_user_can_join(&$config, $team) {
     global $USER, $COURSE, $DB;
 
@@ -220,7 +219,7 @@ function teams_user_can_join(&$config, $team) {
     if (!$team->openteam || !has_capability('block/teams:apply', $coursecontext) || empty($config->allowrequests)) {
         return false;
     }
-    
+
     // If already has a request here go out.
     if ($DB->get_record('block_teams_requests', array('userid' => $USER->id, 'groupid' => $team->groupid))) {
         return false;

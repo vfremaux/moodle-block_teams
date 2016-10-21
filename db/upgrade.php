@@ -39,7 +39,7 @@ function xmldb_block_teams_upgrade($oldversion=0) {
         $field = new xmldb_field('courseid');
         $field->set_attributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'id');
         if (!$dbman->field_exists($table, $field)) {
-            // Launch add field refresh
+            // Launch add field refresh.
             $dbman->add_field($table, $field);
         }
 
@@ -61,7 +61,7 @@ function xmldb_block_teams_upgrade($oldversion=0) {
         // Adding keys to table block_teams_requests.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
 
-       // Adding indexes to table block_teams_requests.
+        // Adding indexes to table block_teams_requests.
         $table->add_index('ix_uniq', XMLDB_INDEX_UNIQUE, array('courseid', 'groupid', 'userid'));
 
         // Conditionally launch create table for block_teams_requests.

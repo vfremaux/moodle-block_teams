@@ -21,6 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  */
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/blocks/teams/lib.php');
 
 class block_teams extends block_base {
@@ -230,13 +232,13 @@ class block_teams extends block_base {
         }
 
         if ($data->teamvisibility == TEAMS_FORCED_OPEN) {
-            $DB->set_field('block_teams', 'openteam', 1, array('courseid' => $COURSE-id));
+            $DB->set_field('block_teams', 'openteam', 1, array('courseid' => $COURSE->id));
         }
 
         if ($data->teamvisibility == TEAMS_FORCED_CLOSED) {
-            $DB->set_field('block_teams', 'openteam', 0, array('courseid' => $COURSE-id));
+            $DB->set_field('block_teams', 'openteam', 0, array('courseid' => $COURSE->id));
         }
 
-       parent::instance_config_save($data, $nolongerused);
+        parent::instance_config_save($data, $nolongerused);
     }
 }

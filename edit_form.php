@@ -26,9 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 class block_teams_edit_form extends block_edit_form {
 
     protected function specific_definition($mform) {
-        global $DB, $COURSE, $CFG;
 
         $config = get_config('block_teams');
+
         if (!isset($config->default_team_visibility)) {
             set_config('default_team_visibility', TEAMS_INITIAL_CLOSED, 'block_teams');
         }
@@ -65,14 +65,10 @@ class block_teams_edit_form extends block_edit_form {
         $mform->addHelpButton('config_teamvisibility', 'teamvisibility', 'block_teams');
 
         $label = get_string('teamsmaxsize', 'block_teams');
-        $mform->addElement('text', 'config_teamsmaxsize', $label, 0 + @$CFG->team_max_size_default);
+        $mform->addElement('text', 'config_teamsmaxsize', $label, $config->max_size_default);
         $mform->setType('config_teamsmaxsize', PARAM_INT);
 
         $mform->addElement('text', 'config_teamname', get_string('teamname', 'block_teams'), '');
         $mform->setType('config_teamname', PARAM_INT);
-    }
-
-    public function set_data($defaults) {
-        parent::set_data($defaults);
     }
 }

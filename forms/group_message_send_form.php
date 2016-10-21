@@ -34,7 +34,6 @@ class TeamGroupMessageForm extends moodleform {
         $group = $this->_customdata['group'];
         $course = $this->_customdata['course'];
         $count = $this->_customdata['count'];
-        $strrequired = get_string('required');
 
         $a = (object)array(
             'group' => $group->id,

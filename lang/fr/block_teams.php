@@ -22,7 +22,7 @@
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  */
 
-// Capabilities
+// Capabilities.
 $string['teams:addinstance'] = 'Peut ajouter une instance';
 $string['teams:manageteams'] = 'Peut gérer les équipes';
 $string['teams:creategroup'] = 'Peut créer une équipe';
@@ -181,7 +181,7 @@ $string['confirmdeclineemailbody'] = 'Bonjour {$a->firstname},
 $string['deleteselfinvemailsubject'] = 'Annulation d\'invitation';
 $string['deleteselfinvemailbody'] = 'Bonjour {$a->firstname},
 
-L\'invitation pour {$a->user} dans l\'équipe "{$a->group}" dans le cours "{$a->course}" a été supprimée par 
+L\'invitation pour {$a->user} dans l\'équipe "{$a->group}" dans le cours "{$a->course}" a été supprimée par
 votre invité suite à une autre action de sa part.
 ';
 

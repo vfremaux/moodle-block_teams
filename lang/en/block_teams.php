@@ -91,8 +91,8 @@ $string['groupmembers'] = 'Current Team Members';
 $string['groupmessagesent'] = 'Team Messages Sent';
 $string['groupmodenotset'] = 'This block requires the course Group mode to be "separate" or "visible" at least';
 $string['groupname'] = 'Team name';
-$string['grouprequests'] ='Membership requests';
-$string['grouprequestsdesc'] ='You have join requests pending';
+$string['grouprequests'] = 'Membership requests';
+$string['grouprequestsdesc'] = 'You have join requests pending';
 $string['invalidinvite'] = 'invalid invite';
 $string['inviteaccepted'] = 'You have been added to this team';
 $string['inviteauser'] = 'Invite a user';
@@ -133,7 +133,7 @@ $string['reject'] = 'Reject';
 $string['rejectconfirm'] = 'Are you sure you want to reject the join request of {$a->name} in team {$a->group}?';
 $string['removefromgroup'] = 'Are you sure you want to delete the user: {$a->name} from the team: {$a->group}?';
 $string['removegroup'] = 'Are you sure you want to delete the team: {$a->group} - this will remove all existing members, and delete all team calendar events.';
-$string['removemefromgroup'] ='Remove me from this team';
+$string['removemefromgroup'] = 'Remove me from this team';
 $string['requestaccepted'] = 'Join request accepted';
 $string['requestrejected'] = 'Join request rejected';
 $string['revokeinvite'] = 'Delete this invite';
@@ -211,7 +211,7 @@ The invite for {$a->user} to the Team "{$a->group}" in the course "{$a->course}"
 $string['deleteselfinvemailsubject'] = 'Teams / Invite self deleted';
 $string['deleteselfinvemailbody'] = 'Hi {$a->firstname},
 
-The invite for {$a->user} to the Team "{$a->group}" in the course "{$a->course}" has been deleted by invited user due to 
+The invite for {$a->user} to the Team "{$a->group}" in the course "{$a->course}" has been deleted by invited user due to
 another action.
 ';
 
