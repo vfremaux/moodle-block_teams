@@ -170,12 +170,12 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
                 // Add capability to force acceptance
                 $params = array('id' => $blockid, 'what' => 'accept', 'userid' => $inv->userid, 'groupid' => $groupid);
                 $accepturl = new moodle_url('/blocks/teams/manageteam.php', $params);
-                $pix = <img src="'.$OUTPUT->pix_url('t/add').'" />;
+                $pix = '<img src="'.$OUTPUT->pix_url('t/add').'" />';
                 $cmds = '<a title="'.get_string('forceinvite', 'block_teams').'" href="'.$accepturl.'">'.$pix.'</a>';
             }
             $params = array('id' => $blockid, 'what' => 'deleteinv', 'userid' => $inv->userid, 'groupid' => $groupid);
             $manageurl = new moodle_url('/blocks/teams/manageteam.php', $params);
-            $pix = <img src="'.$OUTPUT->pix_url('t/delete').'" />;
+            $pix = '<img src="'.$OUTPUT->pix_url('t/delete').'" />';
             $cmds .= ' <a title="'.get_string('revokeinvite', 'block_teams').'" href="'.$manageurl.'">'.$pix.'</a>';
             $date = teams_date_format($inv->timemodified);
             $table->data[] = array($userlink, $date, $cmds);
@@ -221,7 +221,7 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
                         'city' => 1,
                         'country' => 1,
                         'profile' => 1,
-                        'mnethostid' => 1)
+                        'mnethostid' => 1);
         $params = array('id' => $blockid,
                         'groupid' => $groupid,
                         'perpage' => $perpage,

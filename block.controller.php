@@ -25,7 +25,7 @@ namespace block_teams;
 
 defined('MOODLE_INTERNAL') || die();
 
-class block_teams_controller {
+class block_controller {
 
     protected $data;
 
