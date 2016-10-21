@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package    block_teams
  * @category   blocks
@@ -23,6 +21,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  */
+defined('MOODLE_INTERNAL') || die();
 
 class block_teams_edit_form extends block_edit_form {
 
@@ -36,10 +35,12 @@ class block_teams_edit_form extends block_edit_form {
 
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
 
-        $mform->addElement('advcheckbox', 'config_allowmultipleteams', get_string('allowmultipleteams', 'block_teams'), '', 0);
+        $label = get_string('allowmultipleteams', 'block_teams');
+        $mform->addElement('advcheckbox', 'config_allowmultipleteams', $label, '', 0);
         $mform->disabledIf('config_allowmultipleteams', 'config_allowleadmultipleteams', 'checked');
 
-        $mform->addElement('advcheckbox', 'config_allowleadmultipleteams', get_string('allowleadmultipleteams', 'block_teams'), '', 0);
+        $label = get_string('allowleadmultipleteams', 'block_teams');
+        $mform->addElement('advcheckbox', 'config_allowleadmultipleteams', $label, '', 0);
 
         if ($config->site_invite) {
             $mform->addElement('advcheckbox', 'config_teamsiteinvite', get_string('allowteamsiteinvite', 'block_teams'));
@@ -49,7 +50,8 @@ class block_teams_edit_form extends block_edit_form {
 
         $mform->addElement('advcheckbox', 'config_allowrequests', get_string('allowrequests', 'block_teams'), '', 1);
 
-        $mform->addElement('advcheckbox', 'config_teaminviteneedsacceptance', get_string('teaminviteneedsacceptance', 'block_teams'));
+        $label = get_string('teaminviteneedsacceptance', 'block_teams');
+        $mform->addElement('advcheckbox', 'config_teaminviteneedsacceptance', $label);
         $mform->setDefault('config_teaminviteneedsacceptance', $config->invite_needs_acceptance);
         $mform->setAdvanced('config_teaminviteneedsacceptance');
         $mform->addHelpButton('config_teaminviteneedsacceptance', 'teaminviteneedsacceptance', 'block_teams');
@@ -62,7 +64,8 @@ class block_teams_edit_form extends block_edit_form {
         $mform->setDefault('config_teamvisibility', $config->default_team_visibility);
         $mform->addHelpButton('config_teamvisibility', 'teamvisibility', 'block_teams');
 
-        $mform->addElement('text', 'config_teamsmaxsize', get_string('teamsmaxsize', 'block_teams'), 0 + @$CFG->team_max_size_default);
+        $label = get_string('teamsmaxsize', 'block_teams');
+        $mform->addElement('text', 'config_teamsmaxsize', $label, 0 + @$CFG->team_max_size_default);
         $mform->setType('config_teamsmaxsize', PARAM_INT);
 
         $mform->addElement('text', 'config_teamname', get_string('teamname', 'block_teams'), '');

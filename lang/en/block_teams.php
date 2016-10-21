@@ -1,6 +1,28 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// Capabilities
+/**
+ * @package    block_teams
+ * @category   blocks
+ * @author     Valery Fremaux (valery.fremaux@gmail.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
+ * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
+ */
+
+// Capabilities.
 $string['teams:addinstance'] = 'Can add an instance';
 $string['teams:manageteams'] = 'Can manage teams';
 $string['teams:creategroup'] = 'Can create a team';
@@ -147,7 +169,7 @@ $string['initiallyopen'] = 'Initially visible';
 $string['forcedclosed'] = 'Private (forced)';
 $string['forcedopen'] = 'Visible (forced)';
 
-/* messages */
+// Messages.
 
 $string['inviteemailsubject'] = 'Teams / Group invite';
 $string['inviteemailbody'] = 'Hi, {$a->firstname},
@@ -230,7 +252,7 @@ If you need help, please contact the site administrator,
 {$a->admin}
 ';
 
-/* Helpers */
+// Helpers.
 
 $string['groupinvites_help'] = '
 This section lists people having received an invitation to enter the team from the team leader. Invited users should accept the invitation before

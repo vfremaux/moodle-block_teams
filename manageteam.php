@@ -96,7 +96,7 @@ $PAGE->set_pagelayout('standard');
 $PAGE->navbar->add(get_string('teamgroups', 'block_teams'));
 $PAGE->navbar->add(get_string('manageteamgroup', 'block_teams'));
 
-// Fetch context known data
+// Fetch context known data.
 
 $team = $DB->get_record('block_teams', array('groupid' => $groupid));
 
@@ -105,10 +105,10 @@ $team = $DB->get_record('block_teams', array('groupid' => $groupid));
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('teamgroup', 'block_teams', $group->name));
 
-// Play master controller
+// Play master controller.
 
 if (!empty($action)) {
-    include $CFG->dirroot.'/blocks/teams/manageteam.controller.php';
+    include($CFG->dirroot.'/blocks/teams/manageteam.controller.php');
 }
 
 // Display effective membership.
@@ -168,11 +168,15 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
             $cmds = '';
             if (has_capability('block/teams:addinstance', $context)) {
                 // Add capability to force acceptance
-                $accepturl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $blockid, 'what' => 'accept', 'userid' => $inv->userid, 'groupid' => $groupid));
-                $cmds = '<a title="'.get_string('forceinvite', 'block_teams').'" href="'.$accepturl.'"><img src="'.$OUTPUT->pix_url('t/add').'" /></a>';
+                $params = array('id' => $blockid, 'what' => 'accept', 'userid' => $inv->userid, 'groupid' => $groupid);
+                $accepturl = new moodle_url('/blocks/teams/manageteam.php', $params);
+                $pix = <img src="'.$OUTPUT->pix_url('t/add').'" />;
+                $cmds = '<a title="'.get_string('forceinvite', 'block_teams').'" href="'.$accepturl.'">'.$pix.'</a>';
             }
-            $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $blockid, 'what' => 'deleteinv', 'userid' => $inv->userid, 'groupid' => $groupid));
-            $cmds .= ' <a title="'.get_string('revokeinvite', 'block_teams').'" href="'.$manageurl.'"><img src="'.$OUTPUT->pix_url('t/delete').'" /></a>';
+            $params = array('id' => $blockid, 'what' => 'deleteinv', 'userid' => $inv->userid, 'groupid' => $groupid);
+            $manageurl = new moodle_url('/blocks/teams/manageteam.php', $params);
+            $pix = <img src="'.$OUTPUT->pix_url('t/delete').'" />;
+            $cmds .= ' <a title="'.get_string('revokeinvite', 'block_teams').'" href="'.$manageurl.'">'.$pix.'</a>';
             $date = teams_date_format($inv->timemodified);
             $table->data[] = array($userlink, $date, $cmds);
             $invitecount++;
@@ -191,7 +195,7 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
         // Check if max number of group members has not been exceeded and print invite link.
         echo '<p>'.get_string('searchforusersdesc','block_teams').'</p>';
 
-        // Print search form
+        // Print search form.
         $sqlparams = array();
         $userscopeparams = array();
 
@@ -210,8 +214,21 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
         $site = get_site();
 
         // Create the user filter form.
-        $ufiltering = new user_filtering(array('realname' => 0, 'lastname' => 1, 'firstname' => 1, 'email' => 0, 'city' => 1, 'country' => 1,
-                            'profile' => 1, 'mnethostid' => 1), null, array('id' => $blockid, 'groupid' => $groupid, 'perpage' => $perpage, 'page' => $page, 'sort' => $sort, 'dir' => $dir));
+        $filter = array('realname' => 0,
+                        'lastname' => 1,
+                        'firstname' => 1,
+                        'email' => 0,
+                        'city' => 1,
+                        'country' => 1,
+                        'profile' => 1,
+                        'mnethostid' => 1)
+        $params = array('id' => $blockid,
+                        'groupid' => $groupid,
+                        'perpage' => $perpage,
+                        'page' => $page,
+                        'sort' => $sort,
+                        'dir' => $dir);
+        $ufiltering = new user_filtering($filter, null, $params);
         list($extrasql, $params) = $ufiltering->get_sql_filter();
         $sqlparams = $sqlparams + $params;
 
@@ -236,7 +253,7 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
 
                 list($insql, $params) = $DB->get_in_or_equal(array_keys($alreadygrouped), SQL_PARAMS_NAMED, 'param1', false);
                 $sqlparams = $sqlparams + $params;
-                
+
                 $extrasql = ' id '.$insql;
 
                 // Exclude users already invited.
@@ -251,7 +268,8 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
                 ";
                 if ($alreadyinvited = $DB->get_records_sql($sql2, array($courseid, $groupid))) {
 
-                    list($extrasql2, $params) = $DB->get_in_or_equal(array_keys($alreadyinvited), SQL_PARAMS_NAMED, 'param2', false);
+                    $inset = array_keys($alreadyinvited);
+                    list($extrasql2, $params) = $DB->get_in_or_equal($inset, SQL_PARAMS_NAMED, 'param2', false);
                     $sqlparams = $sqlparams + $params;
     
                     $extrasql .= "
@@ -286,7 +304,8 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
                     $columnicon = ' <img src="'.$OUTPUT->pix_url('/t/$columnicon').'" alt="" />';
 
                 }
-                $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $blockid, 'groupid' => $groupid, 'sort' => $column, 'dir' => $columndir));
+                $params = array('id' => $blockid, 'groupid' => $groupid, 'sort' => $column, 'dir' => $columndir);
+                $manageurl = new moodle_url('/blocks/teams/manageteam.php', $params);
                 $$column = '<a href="'.$manageurl.'">'.$string[$column].'</a>'.$columnicon;
             }
 
@@ -300,7 +319,8 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
 
             $strall = get_string('all');
 
-            $pagingurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $blockid, 'groupid' => $groupid, 'sort' => $sort, 'dir' => $dir, 'perpage' => $perpage));
+            $params = array('id' => $blockid, 'groupid' => $groupid, 'sort' => $sort, 'dir' => $dir, 'perpage' => $perpage);
+            $pagingurl = new moodle_url('/blocks/teams/manageteam.php', $params);
             echo $OUTPUT->paging_bar($usersearchcount, $page, $perpage, ''.$pagingurl.'&amp;');
 
             flush();
@@ -338,8 +358,8 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
                 $override->firstname = 'firstname';
                 $override->lastname = 'lastname';
                 $fullnamelanguage = get_string('fullnamedisplay', '', $override);
-                if (($CFG->fullnamedisplay == 'firstname lastname') or
-                    ($CFG->fullnamedisplay == 'firstname') or
+                if (($CFG->fullnamedisplay == 'firstname lastname') ||
+                    ($CFG->fullnamedisplay == 'firstname') ||
                     ($CFG->fullnamedisplay == 'language' and $fullnamelanguage == 'firstname lastname' )) {
                     $fullnamedisplay = "$firstname / $lastname";
                 } else {
@@ -364,7 +384,8 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
                     $fullname = fullname($user, true);
 
                     $userurl = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $site->id));
-                    $manageurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $blockid, 'groupid' => $groupid, 'what' => 'inviteuser', 'userid' => $user->id));
+                    $params = array('id' => $blockid, 'groupid' => $groupid, 'what' => 'inviteuser', 'userid' => $user->id);
+                    $manageurl = new moodle_url('/blocks/teams/manageteam.php', $params);
                     $table->data[] = array ('<a href="'.$userurl.'">'.$fullname.'</a>',
                                         "$user->city",
                                         "$user->country",
@@ -380,7 +401,8 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
 
         if (!empty($table)) {
             echo html_writer::table($table);
-            $pagingurl = new moodle_url('/blocks/teams/manageteam.php', array('id' => $blockid, 'groupid' => $groupid, 'sort' => $sort, 'dir' => $dir, 'perpage' => $perpage));
+            $params = array('id' => $blockid, 'groupid' => $groupid, 'sort' => $sort, 'dir' => $dir, 'perpage' => $perpage);
+            $pagingurl = new moodle_url('/blocks/teams/manageteam.php', $params);
             echo $OUTPUT->paging_bar($usersearchcount, $page, $perpage, ''.$pagingurl.'&amp;');
         }
         // End of search form printing.

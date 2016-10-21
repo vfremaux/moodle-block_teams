@@ -14,14 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-require_once 'backup_teams_stepslib.php';
-
 /**
  * @package block_teams
  * @subpackage backup-moodle2
  * @copyright 2003 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
+
+require_once 'backup_teams_stepslib.php';
 
 /**
  * Specialised backup task for the html block
@@ -35,7 +36,7 @@ class backup_teams_block_task extends backup_block_task {
     }
 
     protected function define_my_steps() {
-        // page_module has one structure step
+        // Page_module has one structure step.
         $this->add_step(new backup_teams_block_structure_step('teams_structure', 'teams.xml'));
     }
 
@@ -44,11 +45,11 @@ class backup_teams_block_task extends backup_block_task {
     }
 
     public function get_configdata_encoded_attributes() {
-        return array('text_nomatch', 'text_all'); // We need to encode some attrs in configdata
+        return array('text_nomatch', 'text_all'); // We need to encode some attrs in configdata.
     }
 
     static public function encode_content_links($content) {
-        return $content; // No special encoding of links
+        return $content; // No special encoding of links.
     }
 }
 

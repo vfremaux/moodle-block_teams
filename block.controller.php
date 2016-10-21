@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package    block_teams
  * @category   blocks
@@ -23,22 +21,59 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  */
+namespace block_teams;
 
-$systemcontext = context_system::instance();
+defined('MOODLE_INTERNAL') || die();
 
-if ($action == 'lock') {
-    $groupid = required_param('groupid', PARAM_INT);
-    $team = $DB->get_record('block_teams', array('groupid' => $groupid));
-    if ($USER->id == $team->leaderid || has_capability('moodle/site:config', $systemcontext)) {
-        $team->open = 0;
-        $DB->update_record('block_teams', $team);
+class block_teams_controller {
+
+    protected $data;
+
+    protected $received;
+
+    public function receive($cmd, $data = array()) {
+
+        if (!empty($data)) {
+            // Data is fed from outside.
+            $this->data = (object)$data;
+            $this->received = true;
+            return;
+        } else {
+            $this->data = new \StdClass;
+        }
+
+        switch ($cmd) {
+            case 'lock':
+            case 'unlock':
+                $this->data->groupid = required_param('groupid', PARAM_INT);
+                break;
+        }
+
+        $this->received = true;
     }
-}
-if ($action == 'unlock') {
-    $groupid = required_param('groupid', PARAM_INT);
-    $team = $DB->get_record('block_teams', array('groupid' => $groupid));
-    if ($USER->id == $team->leaderid || has_capability('moodle/site:config', $systemcontext)) {
-        $team->open = 1;
-        $DB->update_record('block_teams', $team);
+
+    public function process($cmd) {
+        global $DB, $USER;
+
+        if (!$this->received) {
+            throw new \coding_exception('Data must be received in controller before operation. this is a programming error.');
+        }
+
+        $systemcontext = context_system::instance();
+
+        if ($cmd == 'lock') {
+            $team = $DB->get_record('block_teams', array('groupid' => $this->data->groupid));
+            if ($USER->id == $team->leaderid || has_capability('moodle/site:config', $systemcontext)) {
+                $team->open = 0;
+                $DB->update_record('block_teams', $team);
+            }
+        }
+        if ($cmd == 'unlock') {
+            $team = $DB->get_record('block_teams', array('groupid' => $this->data->groupid));
+            if ($USER->id == $team->leaderid || has_capability('moodle/site:config', $systemcontext)) {
+                $team->open = 1;
+                $DB->update_record('block_teams', $team);
+            }
+        }
     }
 }

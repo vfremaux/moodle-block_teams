@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * @package    block_teams
+ * @category   blocks
+ * @author     Valery Fremaux (valery.fremaux@gmail.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
+ * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
+ */
 
 // Capabilities
 $string['teams:addinstance'] = 'Peut ajouter une instance';
@@ -132,7 +154,7 @@ $string['transferuser'] = 'Etes-vous sûr(e) de vouloir transférer le leadershi
 $string['unteamedgroups'] = 'Groupes sans équipes';
 $string['useralreadyingroup'] = 'Cet utilisateur est déjà membre d\'une équipe dans ce cours ';
 
-/* Messages */
+// Messages.
 
 $string['inviteemailsubject'] = 'Invitation à rejoindre une équipe';
 $string['inviteemailbody'] = 'Bonjour, {$a->firstname},
@@ -217,7 +239,7 @@ Pour plus d\'aide, contactez l\'administrateur du site,
 {$a->admin}
 ';
 
-/* Helpers */
+// Helpers.
 
 $string['groupinvites_help'] = '
 Cette section liste les utilisateurs auxquels le leader de l\'équipe a envoyé une invitation. Les utilisateurs invités doivent accepter l\'invitation avant de faire partie de l\'équipe.

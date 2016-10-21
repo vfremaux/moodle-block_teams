@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package    block_teams
  * @category   blocks
@@ -23,20 +21,21 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  */
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/group/lib.php');
 
 // This is a session security for all management controls.
 require_sesskey();
 
-//* ******************** Removes an orphan group ******************** */
-// Similar to standard group delete control
+/* ******************** Removes an orphan group ******************** */
+// Similar to standard group delete control.
 if ($action == 'deletegroup') {
     $groupid = required_param('groupid', PARAM_INT);
     groups_delete_group($groupid);
 }
 
-//* ******************** Delete team record, deleting also the group ******************** */
+/* ******************** Delete team record, deleting also the group ******************** */
 if ($action == 'deleteteam') {
     $groupid = required_param('groupid', PARAM_INT);
     if ($team = $DB->get_record('block_teams', array('groupid' => $groupid))) {
@@ -56,7 +55,7 @@ if ($action == 'deleteteam') {
     teams_remove_leader_role($team->leaderid, $coursecontext);
 }
 
-//* ******************** Build a team from an existing group, choosing the leader ******************** */
+/* ******************** Build a team from an existing group, choosing the leader ******************** */
 if ($action == 'buildteam') {
     $groupid = required_param('groupid', PARAM_INT);
     $leaderid = required_param('leaderid', PARAM_INT);
@@ -72,13 +71,15 @@ if ($action == 'buildteam') {
     $team->openteam = $config->default_team_visibility;
     $DB->insert_record('block_teams', $team);
 
-    // Check roles to give to members
+    // Check roles to give to members.
     $coursecontext = context_course::instance($COURSE->id);
     teams_set_leader_role($leaderid, $coursecontext);
 
     if ($members) {
         foreach ($members as $m) {
-            if ($m->id == $leaderid) continue;
+            if ($m->id == $leaderid) {
+                continue;
+            }
             teams_remove_leader_role($m->id, $coursecontext);
         }
     }
@@ -88,7 +89,7 @@ if ($action == 'buildteam') {
     $resultmessage = $OUTPUT->notification(get_string('teambuilt', 'block_teams', $a), 'success');
 }
 
-//* ******************** Changes the leader of an existing team ******************** */
+/* ******************** Changes the leader of an existing team ******************** */
 if ($action == 'changeleader') {
     $groupid = required_param('groupid', PARAM_INT);
     $leaderid = required_param('leaderid', PARAM_INT);
@@ -106,7 +107,9 @@ if ($action == 'changeleader') {
 
     if ($members) {
         foreach ($members as $m) {
-            if ($m->id == $leaderid) continue;
+            if ($m->id == $leaderid) {
+                continue;
+            }
             teams_remove_leader_role($m->id, $coursecontext);
         }
     }
