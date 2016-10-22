@@ -72,13 +72,13 @@ class manageteams_controller {
         // This is a session security for all management controls.
         require_sesskey();
 
-        /* ******************** Removes an orphan group ******************** */
+        // Removes an orphan group *********************************************************** *.
         // Similar to standard group delete control.
         if ($cmd == 'deletegroup') {
             groups_delete_group($this->data->groupid);
         }
 
-        /* ******************** Delete team record, deleting also the group ******************** */
+        // Delete team record, deleting also the group ********************************************** *.
         if ($cmd == 'deleteteam') {
             if ($team = $DB->get_record('block_teams', array('groupid' => $this->data->groupid))) {
                 $DB->delete_records('block_teams', array('groupid' => $this->data->groupid));
@@ -97,7 +97,7 @@ class manageteams_controller {
             teams_remove_leader_role($team->leaderid, $coursecontext);
         }
 
-        /* ******************** Build a team from an existing group, choosing the leader ******************** */
+        // Build a team from an existing group, choosing the leader ******************************* *.
         if ($cmd == 'buildteam') {
 
             $config = get_config('block_teams');
@@ -131,7 +131,7 @@ class manageteams_controller {
             $resultmessage = $OUTPUT->notification(get_string('teambuilt', 'block_teams', $a), 'success');
         }
 
-        /* ******************** Changes the leader of an existing team ******************** */
+        // Changes the leader of an existing team ********************************************** *.
         if ($cmd == 'changeleader') {
 
             $group = $DB->get_record('groups', array('id' => $this->data->groupid));
