@@ -56,7 +56,7 @@ $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_heading($strheading);
 if ($context) {
-    $PAGE->navbar->add($course->fullname, $CFG->wwwroot.'/course/view.php?id='.$courseid);
+    $PAGE->navbar->add($course->fullname, new moodle_url('/course/view.php', array('id' => $courseid)));
 }
 $PAGE->navigation->add(get_string('teamgroups', 'block_teams'));
 
@@ -83,7 +83,7 @@ if (groups_is_member($groupid)) {
                     message_post_message($USER, $touser, $data->body, $data->format, 'direct');
                 }
             }
-            echo $OUTPUT->notification(get_string('groupmessagesent', 'block_teams'),'notifysuccess');
+            echo $OUTPUT->notification(get_string('groupmessagesent', 'block_teams'), 'notifysuccess');
             $grpmembers = groups_get_members($groupid);
             $groupleader = teams_get_leader($groupid);
 

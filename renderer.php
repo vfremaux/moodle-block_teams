@@ -48,6 +48,7 @@ class block_teams_renderer extends plugin_renderer_base {
         // Check for invites.
         $returntext = '<strong>'.get_string('groupinvites', 'block_teams') .':&nbsp;</strong><br/>';
         $invites = $DB->get_records_select('block_teams_invites', " userid = ? AND courseid = ? ", array($userid, $courseid));
+
         if (!empty($invites)) {
             $returntext .= get_string('groupinvitesdesc', 'block_teams').":";
             foreach ($invites as $inv) {

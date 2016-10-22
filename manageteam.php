@@ -35,7 +35,6 @@ $blockid = required_param('id', PARAM_INT);
 $groupid = required_param('groupid', PARAM_INT);
 $groupname = optional_param('groupname', '', PARAM_TEXT);
 $action = optional_param('what', '', PARAM_ALPHA);
-$inviteuserid = optional_param('userid', '', PARAM_INT);
 
 $url = new moodle_url('/blocks/teams/manageteam.php', array('id' => $blockid, 'groupid' => $groupid));
 $PAGE->set_url($url);
@@ -108,7 +107,15 @@ echo $OUTPUT->heading(get_string('teamgroup', 'block_teams', $group->name));
 // Play master controller.
 
 if (!empty($action)) {
-    include($CFG->dirroot.'/blocks/teams/manageteam.controller.php');
+    include_once($CFG->dirroot.'/blocks/teams/manageteam.controller.php');
+    $controller = new \block_teams\manageteam_controller();
+    $controller->receive($action);
+    list($status, $output) = $controller->process($action, $theblock);
+    if ($status == -1) {
+        // Controller requires page finishes.
+        echo $output;
+        die;
+    }
 }
 
 // Display effective membership.
@@ -149,7 +156,8 @@ if (empty($action) && isset($group->id)) {
 // Display pending invitations.
 
 echo '<br/><center>';
-echo $OUTPUT->single_button(new moodle_url('/course/view.php', array('id' => $COURSE->id)), get_string('backtocourse', 'block_teams'));
+$buttonurl = new moodle_url('/course/view.php', array('id' => $COURSE->id));
+echo $OUTPUT->single_button($buttonurl, get_string('backtocourse', 'block_teams'));
 echo '</center><br/>';
 
 // Don't show invites or the ability to invite people as this is an accept/decline request.
@@ -160,7 +168,7 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
     echo $OUTPUT->box_start('generalbox');
 
     if (!empty($invites)) {
-        echo $OUTPUT->heading_with_help(get_string('groupinvites','block_teams'), 'groupinvites', 'block_teams');
+        echo $OUTPUT->heading_with_help(get_string('groupinvites', 'block_teams'), 'groupinvites', 'block_teams');
 
         $table = new html_table();
         $table->header = array('', '');
@@ -173,7 +181,7 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
             $userlink = '<a href="'.$userurl.'">'.fullname($inuser).'</a>';
             $cmds = '';
             if (has_capability('block/teams:addinstance', $context)) {
-                // Add capability to force acceptance
+                // Add capability to force acceptance.
                 $params = array('id' => $blockid, 'what' => 'accept', 'userid' => $inv->userid, 'groupid' => $groupid);
                 $accepturl = new moodle_url('/blocks/teams/manageteam.php', $params);
                 $pix = '<img src="'.$OUTPUT->pix_url('t/add').'" />';
@@ -191,7 +199,7 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
     }
     echo $OUTPUT->box_end();
 
-    echo $OUTPUT->heading(get_string('inviteauser','block_teams'), 3);
+    echo $OUTPUT->heading(get_string('inviteauser', 'block_teams'), 3);
 
     echo $OUTPUT->heading(get_string('searchforusers', 'block_teams'));
 
@@ -199,7 +207,7 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
 
     if (empty($theblock->config->teamsmaxsize) || ($theblock->config->teamsmaxsize > ($i + $invitecount))) {
         // Check if max number of group members has not been exceeded and print invite link.
-        echo '<p>'.get_string('searchforusersdesc','block_teams').'</p>';
+        echo '<p>'.get_string('searchforusersdesc', 'block_teams').'</p>';
 
         // Print search form.
         $sqlparams = array();
@@ -301,7 +309,7 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
                         $columndir = 'ASC';
                     }
                 } else {
-                    $columndir = $dir == 'ASC' ? 'DESC':'ASC';
+                    $columndir = ($dir == 'ASC') ? 'DESC' : 'ASC';
                     if ($column == 'lastaccess') {
                         $columnicon = $dir == 'ASC' ? 'up' : 'down';
                     } else {

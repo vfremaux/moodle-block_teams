@@ -19,7 +19,7 @@
  * @category   blocks
  * @author     Valery Fremaux
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
- * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
+ * @copyright  (C) 2014 onwards Valery Fremaux (http://www.mylearningfactory.com)
  */
 defined('MOODLE_INTERNAL') || die();
 
@@ -46,7 +46,7 @@ class block_teams extends block_base {
     }
 
     public function get_content() {
-        global $USER, $CFG, $COURSE, $DB, $PAGE, $OUTPUT;
+        global $USER, $CFG, $COURSE, $DB, $PAGE;
 
         $this->renderer = $PAGE->get_renderer('block_teams');
 

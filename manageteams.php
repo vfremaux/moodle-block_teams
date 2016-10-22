@@ -53,7 +53,12 @@ require_capability('block/teams:manageteams', $context);
 
 $resultmessage = '';
 if (!empty($action)) {
-    include($CFG->dirroot.'/blocks/teams/manageteams.controller.php');
+    include_once($CFG->dirroot.'/blocks/teams/manageteams.controller.php');
+    $controller = new \block_teams\manageteams_controller();
+    $controller->receive($action);
+    $controller->process($action);
+
+    redirect($url);
 }
 
 $PAGE->set_url($url);
