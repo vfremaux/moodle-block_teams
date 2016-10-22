@@ -40,9 +40,6 @@ class backup_teams_block_structure_step extends backup_block_structure_step {
         // Get the block.
         $block = $DB->get_record('block_instances', array('id' => $this->task->get_blockid()));
 
-        // Extract configdata.
-        $config = unserialize(base64_decode($block->configdata));
-
         // Define each element separated.
 
         $teams = new backup_nested_element('teams');

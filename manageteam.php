@@ -35,7 +35,6 @@ $blockid = required_param('id', PARAM_INT);
 $groupid = required_param('groupid', PARAM_INT);
 $groupname = optional_param('groupname', '', PARAM_TEXT);
 $action = optional_param('what', '', PARAM_ALPHA);
-$inviteuserid = optional_param('userid', '', PARAM_INT);
 
 $url = new moodle_url('/blocks/teams/manageteam.php', array('id' => $blockid, 'groupid' => $groupid));
 $PAGE->set_url($url);
@@ -108,7 +107,15 @@ echo $OUTPUT->heading(get_string('teamgroup', 'block_teams', $group->name));
 // Play master controller.
 
 if (!empty($action)) {
-    include($CFG->dirroot.'/blocks/teams/manageteam.controller.php');
+    include_once($CFG->dirroot.'/blocks/teams/manageteam.controller.php');
+    $controller = new \block_teams\manageteam_controller();
+    $controller->receive($action);
+    list($status, $output) = $controller->process($action, $theblock);
+    if ($status == -1) {
+        // Controller requires page finishes.
+        echo $output;
+        die;
+    }
 }
 
 // Display effective membership.

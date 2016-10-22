@@ -39,7 +39,7 @@ function teams_get_teams($userid = 0) {
         $userid = $USER->id;
     }
 
-    if (!$groups = groups_get_all_groups($COURSE->id, $userid)) {
+    if (!groups_get_all_groups($COURSE->id, $userid)) {
         return false;
     }
 
@@ -75,13 +75,15 @@ function teams_send_invite(&$theblock, $userid, $fromuserid, $group) {
     $params = array('courseid' => $COURSE->id, 'userid' => $userid, 'groupid' => $group->id);
     if ($DB->record_exists('block_teams_invites', $params)) {
         if (empty($theblock->config->allowmultipleteams)) {
-            echo $OUTPUT->notification(get_string('alreadyinvited', 'block_teams'));
+            return array('message' => get_string('alreadyinvited', 'block_teams'),
+                         'mode' => '');
         } else {
-            echo $OUTPUT->notification(get_string('alreadyinvitedtogroup', 'block_teams'));
+            return array('message' => get_string('alreadyinvitedtogroup', 'block_teams'),
+                         'mode' => '');
         }
     } else {
 
-        $invite = new stdclass();
+        $invite = new stdClass();
         $invite->courseid = $COURSE->id;
         $invite->userid = $userid;
         $invite->fromuserid = $fromuserid;
@@ -101,7 +103,8 @@ function teams_send_invite(&$theblock, $userid, $fromuserid, $group) {
 
         message_post_message($sendfrom, $sendto, get_string('inviteemailbody', 'block_teams', $a), FORMAT_HTML, 'direct');
 
-        echo $OUTPUT->notification(get_string('invitesent', 'block_teams'), 'notifysuccess');
+        return array('message' => get_string('invitesent', 'block_teams'),
+                     'mode' => 'notifysuccess');
     }
 }
 
@@ -134,7 +137,8 @@ function teams_add_member(&$theblock, $userid, $fromuserid, $group) {
 
     message_post_message($sendfrom, $sendto, get_string('addmemberemailbody', 'block_teams', $a), FORMAT_HTML, 'direct');
 
-    echo $OUTPUT->notification(get_string('memberadded', 'block_teams'), 'notifysuccess');
+    return array('message' => get_string('memberadded', 'block_teams'),
+                 'mode' => 'notifysuccess');
 }
 
 /**

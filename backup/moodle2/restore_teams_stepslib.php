@@ -53,7 +53,7 @@ class restore_teams_block_structure_step extends restore_structure_step {
     public function process_team($data) {
         global $DB;
 
-        $data  = (object) $data;
+        $data = (object) $data;
 
         $data->courseid = $this->task->get_courseid();
         $data->leaderid = $this->get_mappingid('user', $data->leaderid);
