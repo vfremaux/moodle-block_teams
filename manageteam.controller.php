@@ -60,7 +60,6 @@ class manageteam_controller {
                 $this->data->groupname = required_param('groupname', PARAM_TEXT);
                 break;
 
-
             case 'delete':
             case 'deleteconfirm':
             case 'deleteinv':
@@ -464,13 +463,13 @@ class manageteam_controller {
             }
 
             if ($groupcount == 1 && groups_is_member($group->id, $USER->id)) {
-               if ($cmd == 'removegroup') {
+                if ($cmd == 'removegroup') {
                     $a = new \StdClass;
                     $a->group = $group->name;
 
                     $params = array('id' => $theblock->instance->id, 'groupid' => $group->id, 'what' => 'removegroupconfirm');
                     $confirmurl = new \moodle_url('/blocks/teams/manageteam.php', $params);
-                    $str .= $OUTPUT->confirm(get_string('removegroup','block_teams', $a), $confirmurl, $coursereturnurl);
+                    $str .= $OUTPUT->confirm(get_string('removegroup', 'block_teams', $a), $confirmurl, $coursereturnurl);
                     $str .= $OUTPUT->footer();
                     return array(-1, $str);
 

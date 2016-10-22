@@ -100,6 +100,8 @@ class manageteams_controller {
         /* ******************** Build a team from an existing group, choosing the leader ******************** */
         if ($cmd == 'buildteam') {
 
+            $config = get_config('block_teams');
+
             $group = $DB->get_record('groups', array('id' => $this->data->groupid));
             $members = groups_get_members($this->data->groupid);
 
