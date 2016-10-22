@@ -23,10 +23,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+
 require_once($CFG->dirroot.'/blocks/teams/manageteam.controller.php');
 require_once($CFG->dirroot.'/blocks/teams/lib.php');
-
-global $CFG;
 
 /**
  * Tests block_teams.
@@ -44,6 +44,7 @@ class block_teams_testcase extends \advanced_testcase {
     /**
      */
     public function test_block_teams_create_delete_team() {
+        global $DB, $CFG, $COURSE;
 
         $config = get_config('block_teams');
 
@@ -57,7 +58,6 @@ class block_teams_testcase extends \advanced_testcase {
 
         $this->setUser($user);
 
-        global $COURSE;
         $COURSE = $course;
 
         $controller = new \block_teams\manageteam_controller();
