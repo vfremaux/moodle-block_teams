@@ -14,10 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * Version details.
+ * Version details
  *
  * @package    block_teams
  * @category   blocks
@@ -26,9 +24,11 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version   = 2015062400;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2014110400;        // Requires this Moodle version
-$plugin->component = 'block_teams'; // Full name of the plugin (used for diagnostics)
+defined('MOODLE_INTERNAL') || die();
+
+$plugin->version   = 2015062400;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2014110400;        // Requires this Moodle version.
+$plugin->component = 'block_teams'; // Full name of the plugin (used for diagnostics).
 $plugin->release = '2.8.0 (Build 2015062400)';
 $plugin->maturity = MATURITY_STABLE;
 
