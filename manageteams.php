@@ -25,8 +25,8 @@
 require('../../config.php');
 require_once($CFG->dirroot.'/blocks/teams/lib.php');
 
-$id = required_param('id', PARAM_INT); // the block instance id
-$action = optional_param('what', '', PARAM_TEXT); // MVC action
+$id = required_param('id', PARAM_INT); // The block instance id.
+$action = optional_param('what', '', PARAM_TEXT); // MVC action.
 
 if (!$instance = $DB->get_record('block_instances', array('id' => $id))) {
     print_error('errorinvalidblock', 'block_teams');
@@ -47,12 +47,18 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
 $url = new moodle_url('/blocks/teams/manageteams.php', array('id' => $id));
 
 // Security.
+
 require_login($course, true);
 require_capability('block/teams:manageteams', $context);
 
 $resultmessage = '';
 if (!empty($action)) {
-    include($CFG->dirroot.'/blocks/teams/manageteams.controller.php');
+    include_once($CFG->dirroot.'/blocks/teams/manageteams.controller.php');
+    $controller = new \block_teams\manageteams_controller();
+    $controller->receive($action);
+    $controller->process($action);
+
+    redirect($url);
 }
 
 $PAGE->set_url($url);
@@ -82,24 +88,34 @@ foreach ($teams as $t) {
     $othermembers = '';
     if ($members = groups_get_members($t->groupid,  'u.id,'.get_all_user_name_fields(true, 'u'))) {
         $others = array();
-        foreach($members as $m) {
+        foreach ($members as $m) {
             if ($m->id != $t->leaderid) {
-                $changeleaderurl = new moodle_url('/blocks/teams/manageteams.php', array('id' => $id, 'what' => 'changeleader', 'groupid' => $t->groupid, 'leaderid' => $m->id, 'sesskey' => sesskey()));
-                $command = ' <a href="'.$changeleaderurl.'" title="'.get_string('changeleaderto', 'block_teams').'"><img src="'.$OUTPUT->pix_url('i/enrolusers').'"></a>';
+                $params = array('id' => $id,
+                                'what' => 'changeleader',
+                                'groupid' => $t->groupid,
+                                'leaderid' => $m->id,
+                                'sesskey' => sesskey());
+                $changeleaderurl = new moodle_url('/blocks/teams/manageteams.php', $params);
+                $title = get_string('changeleaderto', 'block_teams');
+                $pix = '<img src="'.$OUTPUT->pix_url('i/enrolusers').'">';
+                $command = ' <a href="'.$changeleaderurl.'" title="'.$title.'">'.$pix.'</a>';
                 $others[] = fullname($m).$command;
             }
         }
         $othermembers = implode(', ', $others);
     }
 
-    $deleteurl = new moodle_url('/blocks/teams/manageteams.php', array('id' => $id, 'what' => 'deleteteam', 'groupid' => $t->groupid, 'sesskey' => sesskey()));
-    $commands = ' <a href="'.$deleteurl.'" title="'.get_string('delete').'"><img src="'.$OUTPUT->pix_url('t/delete').'"></a>';
+    $params = array('id' => $id, 'what' => 'deleteteam', 'groupid' => $t->groupid, 'sesskey' => sesskey());
+    $deleteurl = new moodle_url('/blocks/teams/manageteams.php', $params);
+    $pix = '<img src="'.$OUTPUT->pix_url('t/delete').'">';
+    $commands = ' <a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
 
     $table->data[] = array($teamname, '<b>'.$leader.'</b>', $othermembers, $commands);
 }
 
 $idlist = implode("','", $teamedgroups);
-$unteamedgroups = $DB->get_records_select('groups', " courseid = ? AND id NOT IN('$idlist')", array($courseid));
+$select = " courseid = ? AND id NOT IN('$idlist')";
+$unteamedgroups = $DB->get_records_select('groups', $select, array($courseid));
 
 if ($unteamedgroups) {
     $groupstr = get_string('group');
@@ -114,14 +130,23 @@ if ($unteamedgroups) {
         if ($members = groups_get_members($g->id,  'u.id,'.get_all_user_name_fields(true, 'u'))) {
             $others = array();
             foreach ($members as $m) {
-                $maketeamurl = new moodle_url('/blocks/teams/manageteams.php', array('id' => $id, 'what' => 'buildteam', 'groupid' => $g->id, 'leaderid' => $m->id, 'sesskey' => sesskey()));
-                $command = ' <a href="'.$maketeamurl.'" title="'.get_string('buildteam', 'block_teams').'"><img src="'.$OUTPUT->pix_url('i/users').'"></a>';
+                $params = array('id' => $id,
+                                'what' => 'buildteam',
+                                'groupid' => $g->id,
+                                'leaderid' => $m->id,
+                                'sesskey' => sesskey());
+                $maketeamurl = new moodle_url('/blocks/teams/manageteams.php', $params);
+                $title = get_string('buildteam', 'block_teams');
+                $pix = '<img src="'.$OUTPUT->pix_url('i/users').'">';
+                $command = ' <a href="'.$maketeamurl.'" title="'.$title.'">'.$pix.'</a>';
                 $others[] = fullname($m). $command;
             }
             $othermembers = implode(', ', $others);
         }
-        $deleteurl = new moodle_url('/blocks/teams/manageteams.php', array('id' => $id, 'what' => 'deletegroup', 'groupid' => $g->id, 'sesskey' => sesskey()));
-        $commands = ' <a href="'.$deleteurl.'" title="'.get_string('delete').'"><img src="'.$OUTPUT->pix_url('t/delete').'"></a>';
+        $params = array('id' => $id, 'what' => 'deletegroup', 'groupid' => $g->id, 'sesskey' => sesskey());
+        $deleteurl = new moodle_url('/blocks/teams/manageteams.php', $params);
+        $pix = '<img src="'.$OUTPUT->pix_url('t/delete').'">';
+        $commands = ' <a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
 
         $unteamedtable->data[] = array($g->name, $othermembers, $commands);
     }

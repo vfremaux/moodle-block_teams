@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -21,6 +20,7 @@
  * @copyright 2003 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/blocks/teams/backup/moodle2/restore_teams_stepslib.php');
 
@@ -44,7 +44,7 @@ class restore_teams_block_task extends restore_block_task {
     }
 
     public function get_configdata_encoded_attributes() {
-        return array(); // We need to encode some attrs in configdata
+        return array(); // We need to encode some attrs in configdata.
     }
 
     static public function define_decode_contents() {

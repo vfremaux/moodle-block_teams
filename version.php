@@ -19,16 +19,16 @@
  *
  * @package    block_teams
  * @category   blocks
- * @copyright  2014 Valery Fremaux (valery.fremaux@gmail.com)
+ * @author Valery Fremaux <valery.fremaux@gmail.com>
+ * @copyright  2014 Valery Fremaux (http://www.mylearningfactory.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author Valery Fremaux (valery.fremaux@gmail.com)
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015011108;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2012120300;        // Requires this Moodle version
-$plugin->component = 'block_teams'; // Full name of the plugin (used for diagnostics)
+$plugin->version   = 2015062400;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2012120300;        // Requires this Moodle version.
+$plugin->component = 'block_teams'; // Full name of the plugin (used for diagnostics).
 $plugin->release = '2.7.0 (Build 2015011108)';
 $plugin->maturity = MATURITY_STABLE;
 
