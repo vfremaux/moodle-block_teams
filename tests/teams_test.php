@@ -60,6 +60,9 @@ class block_teams_testcase extends \advanced_testcase {
 
         $COURSE = $course;
 
+        // Simulate page opening for controller.
+        $output->header();
+
         $controller = new \block_teams\manageteam_controller();
         $groupname = 'Team '.fullname($user);
         $controller->receive('creategroup', array('groupname' => $groupname));
