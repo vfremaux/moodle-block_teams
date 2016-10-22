@@ -33,11 +33,11 @@ $groupid = required_param('groupid', PARAM_INT);
 if (!$instance = $DB->get_record('block_instances', array('id' => $blockid))) {
     print_error('errorinvalidblock', 'block_teams');
 }
-if (!$theBlock = block_instance('teams', $instance)) {
+if (!$theblock = block_instance('teams', $instance)) {
     print_error('errorbadblockinstance', 'block_teams');
 }
 
-$context = context::instance_by_id($theBlock->instance->parentcontextid);
+$context = context::instance_by_id($theblock->instance->parentcontextid);
 $courseid = $context->instanceid;
 
 if (! ($course = $DB->get_record('course', array('id' => $courseid))) ) {
@@ -56,7 +56,7 @@ $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_heading($strheading);
 if ($context) {
-    $PAGE->navbar->add($course->fullname, $CFG->wwwroot.'/course/view.php?id='.$courseid);
+    $PAGE->navbar->add($course->fullname, new moodle_url('/course/view.php', array('id' => $courseid)));
 }
 $PAGE->navigation->add(get_string('teamgroups', 'block_teams'));
 
@@ -66,7 +66,7 @@ if (groups_is_member($groupid)) {
 
         require_once($CFG->dirroot.'/message/lib.php');
 
-        $mform = new TeamGroupMessageForm('', array('course' => $COURSE, 'group' => $group, 'count' => count($grpmembers)-1));
+        $mform = new TeamGroupMessageForm('', array('course' => $COURSE, 'group' => $group, 'count' => count($grpmembers) - 1));
 
         if ($mform->is_cancelled()) {
             redirect(new moodle_url('/course/view.php', array('id' => $COURSE->id)));
@@ -83,7 +83,7 @@ if (groups_is_member($groupid)) {
                     message_post_message($USER, $touser, $data->body, $data->format, 'direct');
                 }
             }
-            echo $OUTPUT->notification(get_string('groupmessagesent','block_teams'),'notifysuccess');
+            echo $OUTPUT->notification(get_string('groupmessagesent', 'block_teams'), 'notifysuccess');
             $grpmembers = groups_get_members($groupid);
             $groupleader = teams_get_leader($groupid);
 

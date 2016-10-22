@@ -21,6 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  */
+defined('MOODLE_INTERNAL') || die();
 
 define('TEAMS_INITIAL_CLOSED', 0);
 define('TEAMS_INITIAL_OPEN', 1);
@@ -38,11 +39,9 @@ function teams_get_teams($userid = 0) {
         $userid = $USER->id;
     }
 
-    if (!$groups = groups_get_all_groups($COURSE->id, $userid)) {
+    if (!groups_get_all_groups($COURSE->id, $userid)) {
         return false;
     }
-
-    $groupids = implode(',', array_keys($groups));
 
     $sql = "
         SELECT DISTINCT
@@ -71,17 +70,20 @@ function teams_get_teams($userid = 0) {
  * @param object $group the course
  */
 function teams_send_invite(&$theblock, $userid, $fromuserid, $group) {
-    global $CFG, $COURSE, $DB, $OUTPUT;
+    global $COURSE, $DB, $OUTPUT;
 
-    if ($DB->record_exists('block_teams_invites', array('courseid' => $COURSE->id, 'userid' => $userid, 'groupid' => $group->id))) {
+    $params = array('courseid' => $COURSE->id, 'userid' => $userid, 'groupid' => $group->id);
+    if ($DB->record_exists('block_teams_invites', $params)) {
         if (empty($theblock->config->allowmultipleteams)) {
-            echo $OUTPUT->notification(get_string('alreadyinvited', 'block_teams'));
+            return array('message' => get_string('alreadyinvited', 'block_teams'),
+                         'mode' => '');
         } else {
-            echo $OUTPUT->notification(get_string('alreadyinvitedtogroup', 'block_teams'));
+            return array('message' => get_string('alreadyinvitedtogroup', 'block_teams'),
+                         'mode' => '');
         }
     } else {
 
-        $invite = new stdclass();
+        $invite = new stdClass();
         $invite->courseid = $COURSE->id;
         $invite->userid = $userid;
         $invite->fromuserid = $fromuserid;
@@ -89,7 +91,7 @@ function teams_send_invite(&$theblock, $userid, $fromuserid, $group) {
         $invite->timemodified = time();
         $DB->insert_record('block_teams_invites', $invite);
 
-        //now send e-mail
+        // Now send e-mail.
         $sendto = $DB->get_record('user', array('id' => $userid));
         $sendfrom = $DB->get_record('user', array('id' => $fromuserid));
         $a = new StdClass();
@@ -101,7 +103,8 @@ function teams_send_invite(&$theblock, $userid, $fromuserid, $group) {
 
         message_post_message($sendfrom, $sendto, get_string('inviteemailbody', 'block_teams', $a), FORMAT_HTML, 'direct');
 
-        echo $OUTPUT->notification(get_string('invitesent', 'block_teams'),'notifysuccess');
+        return array('message' => get_string('invitesent', 'block_teams'),
+                     'mode' => 'notifysuccess');
     }
 }
 
@@ -113,7 +116,7 @@ function teams_send_invite(&$theblock, $userid, $fromuserid, $group) {
  * @param object $group the course
  */
 function teams_add_member(&$theblock, $userid, $fromuserid, $group) {
-    global $CFG, $COURSE, $DB, $OUTPUT;
+    global $COURSE, $DB, $OUTPUT;
 
     $newgroupmember = new stdClass;
     $newgroupmember->groupid = $group->id;
@@ -121,7 +124,7 @@ function teams_add_member(&$theblock, $userid, $fromuserid, $group) {
     $newgroupmember->timeadded = time();
     $DB->insert_record('groups_members', $newgroupmember);
 
-    //now send e-mail
+    // Now send e-mail.
     $sendto = $DB->get_record('user', array('id' => $userid));
     $sendfrom = $DB->get_record('user', array('id' => $fromuserid));
 
@@ -134,22 +137,23 @@ function teams_add_member(&$theblock, $userid, $fromuserid, $group) {
 
     message_post_message($sendfrom, $sendto, get_string('addmemberemailbody', 'block_teams', $a), FORMAT_HTML, 'direct');
 
-    echo $OUTPUT->notification(get_string('memberadded', 'block_teams'),'notifysuccess');
+    return array('message' => get_string('memberadded', 'block_teams'),
+                 'mode' => 'notifysuccess');
 }
 
 /**
-* Prepares a mail with predefined body and send
-* @param int $touserid
-* @param int $fromuserid
-* @param object $group
-* @param string $action aselector to choose the mail template from lang strings
-* @return void
-*/
+ * Prepares a mail with predefined body and send
+ * @param int $touserid
+ * @param int $fromuserid
+ * @param object $group
+ * @param string $action aselector to choose the mail template from lang strings
+ * @return void
+ */
 function teams_send_email($touserid, $fromuserid, $group, $action) {
     global $COURSE, $DB;
 
     $sendto = $DB->get_record('user', array('id' => $touserid));
-    $sendfrom = $DB->get_record('user',array('id' => $fromuserid));
+    $sendfrom = $DB->get_record('user', array('id' => $fromuserid));
 
     $a = new stdclass();
     $a->firstname = $sendto->firstname;
@@ -158,7 +162,8 @@ function teams_send_email($touserid, $fromuserid, $group, $action) {
     $a->courseurl = new moodle_url('/course/view.php', array('id' => $COURSE->id));
     $a->group = $group->name;
 
-    email_to_user($sendto, $sendfrom, get_string($action.'emailsubject','block_teams'), get_string($action.'emailbody', 'block_teams', $a));
+    $subject = get_string($action.'emailsubject', 'block_teams');
+    email_to_user($sendto, $sendfrom, $subject, get_string($action.'emailbody', 'block_teams', $a));
 }
 
 
@@ -188,7 +193,7 @@ function teams_date_format($date) {
 
 function teams_is_member($team) {
     global $DB, $COURSE, $USER;
-    
+
     $sql = "
         SELECT
             COUNT(*)
@@ -209,7 +214,7 @@ function teams_is_member($team) {
  * Checks if user can join:
  * - is not member of any group OR
  * - can belong to multiple teams
- */ 
+ */
 function teams_user_can_join(&$config, $team) {
     global $USER, $COURSE, $DB;
 
@@ -218,8 +223,8 @@ function teams_user_can_join(&$config, $team) {
     if (!$team->openteam || !has_capability('block/teams:apply', $coursecontext) || empty($config->allowrequests)) {
         return false;
     }
-    
-    // If already has a request here go out
+
+    // If already has a request here go out.
     if ($DB->get_record('block_teams_requests', array('userid' => $USER->id, 'groupid' => $team->groupid))) {
         return false;
     }
@@ -332,7 +337,9 @@ function teams_set_leader_role($userid, $context) {
         }
     }
 
-    if ($empowered) return;
+    if ($empowered) {
+        return;
+    }
 
     // Remove non leader role, whatever archetype it has.
     if (!empty($config->non_leader_role)) {
@@ -344,12 +351,12 @@ function teams_set_leader_role($userid, $context) {
         }
     }
 
-    // If a special role assign needs to be added to user, add it
+    // If a special role assign needs to be added to user, add it.
     if (!empty($config->leader_role)) {
 
         if ($oldrolesassigns) {
             foreach ($oldrolesassigns as $ra) {
-                // Only remove student like roles
+                // Only remove student like roles.
                 $archetype = $DB->get_field('role', 'archetype', array('shortname' => $ra->shortname));
                 if (in_array($archetype, array('student', 'user'))) {
                     role_unassign($ra->roleid, $userid, $context->id);
@@ -388,7 +395,9 @@ function teams_remove_leader_role($userid, $context) {
         }
     }
 
-    if ($empowered) return;
+    if ($empowered) {
+        return;
+    }
 
     // Remove leader role, whatever archetype it has.
     if (!empty($config->leader_role)) {
@@ -400,14 +409,17 @@ function teams_remove_leader_role($userid, $context) {
         }
     }
 
-    // If a special role assign needs to be added to user, add it
+    // If a special role assign needs to be added to user, add it.
     if (!empty($config->non_leader_role)) {
 
-        // If has other non powered roles remaining on the way, remove them
+        // If has other non powered roles remaining on the way, remove them.
         if (!empty($oldrolesassigns)) {
             foreach ($oldrolesassigns as $ra) {
-                // Only remove student like roles
-                if ($ra->roleid == $config->leader_role) continue; // already done.
+                // Only remove student like roles.
+                if ($ra->roleid == $config->leader_role) {
+                    // Already done.
+                    continue;
+                }
                 $archetype = $DB->get_field('role', 'archetype', array('shortname' => $ra->shortname));
                 if (in_array($archetype, array('student', 'user'))) {
                     role_unassign($ra->roleid, $userid, $context->id);

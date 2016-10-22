@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -22,8 +21,9 @@
  * @copyright 2003 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
-/**
+/*
  * Define all the backup steps that wll be used by the backup_page_module_block_task
  */
 
@@ -35,14 +35,10 @@ class backup_teams_block_structure_step extends backup_block_structure_step {
     protected function define_structure() {
         global $DB;
 
-        // TODO : check how to get this information
-        // $userinfo = $this->get_setting_value('userinfo');
+        // TODO : check how to get this userinfo information.
 
         // Get the block.
         $block = $DB->get_record('block_instances', array('id' => $this->task->get_blockid()));
-
-        // Extract configdata
-        $config = unserialize(base64_decode($block->configdata));
 
         // Define each element separated.
 
@@ -55,9 +51,8 @@ class backup_teams_block_structure_step extends backup_block_structure_step {
 
         // Define sources.
 
-        // if ($userinfo) {
-            $team->set_source_table('block_teams', array('courseid' => backup::VAR_COURSEID));
-        // }
+        // TODO : conditionalize with user info.
+        $team->set_source_table('block_teams', array('courseid' => backup::VAR_COURSEID));
 
         // ID Annotations (none).
         $team->annotate_ids('user', 'leaderid');

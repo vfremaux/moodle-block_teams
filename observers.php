@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package    block_teams
  * @category   blocks
@@ -23,6 +21,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  */
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/blocks/teams/lib.php');
 
@@ -37,7 +36,7 @@ class block_teams_event_observer {
      * Called from Course Group core API (@see /group/lib.php§groups_delete_group)
      * Called from Teams block API (@see /blocks/teams/lib.php§groups_delete_group)
      */
-    static function on_group_deleted($e) {
+    public static function on_group_deleted($e) {
         global $DB;
 
         $deletedteam = $DB->get_record('block_teams', array('groupid' => $e->objectid));
@@ -45,28 +44,30 @@ class block_teams_event_observer {
         if ($deletedteam) {
             $DB->delete_records('block_teams', array('groupid' => $e->objectid));
             $DB->delete_records('block_teams_invites', array('groupid' => $e->objectid));
-    
+
             // Remove leader role to team leader if no more lead after deletion.
             if (!teams_get_leaded_teams($deletedteam->leaderid, $deletedteam->courseid, true)) {
                 $coursecontext = context_course::instance($deletedteam->courseid);
                 teams_remove_leader_role($deletedteam->leaderid, $coursecontext);
             }
         }
-
-        // return true;
     }
 
     /**
      * Triggered when a role is unassigned in the course
      * Should check this is the leader role, and let an associated team unleaded
      */
-    static function on_role_unassigned($e) {
+    public static function on_role_unassigned($e) {
         global $DB;
 
         $config = get_config('block_teams');
 
-        if ($e->contextlevel != CONTEXT_COURSE) return;
-        if ($e->objectid != $config->leader_role) return;
+        if ($e->contextlevel != CONTEXT_COURSE) {
+            return;
+        }
+        if ($e->objectid != $config->leader_role) {
+            return;
+        }
 
         $sql = "
             SELECT
@@ -86,7 +87,7 @@ class block_teams_event_observer {
             foreach ($relatedgroups as $g) {
                 $team = $DB->get_record('block_teams', array('groupid' => $g->id));
                 if ($team->leaderid == $e->relateduserid) {
-                    // Only discard if being the leader
+                    // Only discard if being the leader.
                     $DB->set_field('block_teams', 'leaderid', 0, array('id' => $team->id));
                 }
             }
@@ -97,16 +98,20 @@ class block_teams_event_observer {
      * Triggered when a role is unassigned in the course
      * Should check this is the leader role, and associate user as team leader
      */
-    static function on_role_assigned($e) {
+    public static function on_role_assigned($e) {
         global $DB;
 
         $config = get_config('block_teams');
 
-        if ($e->contextlevel != CONTEXT_COURSE) return;
-        if ($e->objectid != $config->leader_role) return;
+        if ($e->contextlevel != CONTEXT_COURSE) {
+            return;
+        }
+        if ($e->objectid != $config->leader_role) {
+            return;
+        }
 
         $sql = "
-            SELECT 
+            SELECT
                 g.id
             FROM
                 {groups} g
@@ -125,7 +130,5 @@ class block_teams_event_observer {
                 $DB->set_field('block_teams', 'leaderid', $e->relateduserid, array('id' => $team->id));
             }
         }
-
-        // return true;
     }
 }

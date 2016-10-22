@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * Version details.
  *
  * @package    block_teams
  * @category   blocks
- * @author Valery Fremaux (valery.fremaux@gmail.com)
- * @copyright  2014 Valery Fremaux (valery.fremaux@gmail.com)
+ * @author Valery Fremaux <valery.fremaux@gmail.com>
+ * @copyright  2014 Valery Fremaux (http://www.mylearningfactory.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
