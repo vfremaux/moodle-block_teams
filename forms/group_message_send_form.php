@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package    block_teams
  * @category   blocks
@@ -23,6 +21,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2003 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/formslib.php');
 
@@ -35,7 +34,6 @@ class TeamGroupMessageForm extends moodleform {
         $group = $this->_customdata['group'];
         $course = $this->_customdata['course'];
         $count = $this->_customdata['count'];
-        $strrequired = get_string('required');
 
         $a = (object)array(
             'group' => $group->id,

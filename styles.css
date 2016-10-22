@@ -9,13 +9,13 @@
 }
 
 .team-invided-member {
+    -moz-opacity:0.5;
     opacity:0.5;
-    moz-opacity:0.5;
 }
 
 .team-instance {
-    margin-bottom:10px;
     background-color:#e0e0e0;
+    margin-bottom:10px;
     padding:2px;
 }
 
@@ -24,8 +24,8 @@
 } 
 
 team-shadowed {
-    opacity:0.5;
     -moz-opacity:0.5;
+    opacity:0.5;
 }
 
 .team-date-green{
@@ -61,6 +61,6 @@ team-shadowed {
 }
 
 .block_teams.block .footer {
-    padding-top:10px;
     font-size:0.9em;
+    padding-top:10px;
 }
