@@ -531,40 +531,40 @@ class manageteam_controller {
                         }
                     }
 
-                    } else if ($cmd == 'transferuser') {
-                        $a = new StdClass;
-                        $a->group = $group->name;
-                        $user = $DB->get_record('user', array('id' => $this->data->userid));
-                        $a->user = fullname($user);
-                        $params = array('id' => $theblock->instance->id,
-                                        'groupid' => $this->data->groupid,
-                                        'what' => 'transferconfirm',
-                                        'userid' => $user->id);
-                        $confirmurl = new \moodle_url('/blocks/teams/manageteam.php', $params);
-                        $str .= $OUTPUT->confirm(get_string('transferuser', 'block_teams', $a), $confirmurl, $coursereturnurl);
-                        $str .= $OUTPUT->footer();
-                        die;
-                    } else if ($cmd == 'transferconfirm') {
-                        $team->leaderid = $this->data->userid;
-                        $DB->update_record('block_teams', $team);
+                } else if ($cmd == 'transferuser') {
+                    $a = new StdClass;
+                    $a->group = $group->name;
+                    $user = $DB->get_record('user', array('id' => $this->data->userid));
+                    $a->user = fullname($user);
+                    $params = array('id' => $theblock->instance->id,
+                                    'groupid' => $this->data->groupid,
+                                    'what' => 'transferconfirm',
+                                    'userid' => $user->id);
+                    $confirmurl = new \moodle_url('/blocks/teams/manageteam.php', $params);
+                    $str .= $OUTPUT->confirm(get_string('transferuser', 'block_teams', $a), $confirmurl, $coursereturnurl);
+                    $str .= $OUTPUT->footer();
+                    die;
+                } else if ($cmd == 'transferconfirm') {
+                    $team->leaderid = $this->data->userid;
+                    $DB->update_record('block_teams', $team);
 
-                        $coursecontext = \context_course::instance($COURSE->id);
-                        teams_set_leader_role($this->data->userid, $coursecontext);
+                    $coursecontext = \context_course::instance($COURSE->id);
+                    teams_set_leader_role($this->data->userid, $coursecontext);
 
-                        // Remove leader role if no more leaded groups.
-                        if (!teams_get_leaded_teams($USER->id, $COURSE->id, true)) {
-                           teams_remove_leader_role($USER->id, $coursecontext);
-                        }
-
-                        // Now e-mail new group leader regarding transfer.
-                        teams_send_email($team->leaderid, $USER->id, $group, $cmd);  // Email group leader.
-
-                        $str .= $OUTPUT->notification(get_string('transferconfirmed', 'block_teams'), 'notifysuccess');
-                        $str .= $OUTPUT->continue_button($coursereturnurl);
+                    // Remove leader role if no more leaded groups.
+                    if (!teams_get_leaded_teams($USER->id, $COURSE->id, true)) {
+                       teams_remove_leader_role($USER->id, $coursecontext);
                     }
-                } else {
-                    print_error('errornoleader', 'block_teams');
+
+                    // Now e-mail new group leader regarding transfer.
+                    teams_send_email($team->leaderid, $USER->id, $group, $cmd);  // Email group leader.
+
+                    $str .= $OUTPUT->notification(get_string('transferconfirmed', 'block_teams'), 'notifysuccess');
+                    $str .= $OUTPUT->continue_button($coursereturnurl);
                 }
+            } else {
+                print_error('errornoleader', 'block_teams');
+            }
 
             /* ************************************* INVITE ****************************** */
             /* Users : leaders */

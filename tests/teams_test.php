@@ -61,7 +61,7 @@ class block_teams_testcase extends \advanced_testcase {
         $COURSE = $course;
 
         $controller = new \block_teams\manageteam_controller();
-        $groupname = 'Team '.$user->fullame();
+        $groupname = 'Team '.fullname($user);
         $controller->receive('creategroup', array('groupname' => $groupname));
         list($status, $output) = $controller->process('creategroup', $theblock);
 
