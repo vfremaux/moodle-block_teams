@@ -553,7 +553,7 @@ class manageteam_controller {
 
                     // Remove leader role if no more leaded groups.
                     if (!teams_get_leaded_teams($USER->id, $COURSE->id, true)) {
-                       teams_remove_leader_role($USER->id, $coursecontext);
+                        teams_remove_leader_role($USER->id, $coursecontext);
                     }
 
                     // Now e-mail new group leader regarding transfer.
