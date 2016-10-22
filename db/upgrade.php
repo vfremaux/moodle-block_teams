@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package    block_teams
  * @category   blocks
@@ -23,16 +21,14 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2003 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
 function xmldb_block_teams_upgrade($oldversion=0) {
-// This function does anything necessary to upgrade
-// older versions to match current functionality
-
-    global $CFG, $DB;
+    global $DB;
 
     $result = true;
 
-// Moodle 2 -- Upgrade break
+    // Moodle 2 -- Upgrade break.
 
     $dbman = $DB->get_manager();
 
@@ -43,7 +39,7 @@ function xmldb_block_teams_upgrade($oldversion=0) {
         $field = new xmldb_field('courseid');
         $field->set_attributes(XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'id');
         if (!$dbman->field_exists($table, $field)) {
-            // Launch add field refresh
+            // Launch add field refresh.
             $dbman->add_field($table, $field);
         }
 
@@ -65,7 +61,7 @@ function xmldb_block_teams_upgrade($oldversion=0) {
         // Adding keys to table block_teams_requests.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
 
-       // Adding indexes to table block_teams_requests.
+        // Adding indexes to table block_teams_requests.
         $table->add_index('ix_uniq', XMLDB_INDEX_UNIQUE, array('courseid', 'groupid', 'userid'));
 
         // Conditionally launch create table for block_teams_requests.

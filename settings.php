@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package    block_teams
  * @category   blocks
@@ -23,16 +21,24 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  2014 valery fremaux (valery.fremaux@gmail.com)
  */
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/blocks/teams/lib.php');
 
-$settings->add(new admin_setting_configtext('block_teams/max_size_default', get_string('teammaxsizedefault', 'block_teams'),
-                   get_string('configteammaxsizedefault', 'block_teams'), 0, PARAM_INT, 4));
+$key = 'block_teams/max_size_default';
+$label = get_string('teammaxsizedefault', 'block_teams');
+$desc = get_string('configteammaxsizedefault', 'block_teams');
+$settings->add(new admin_setting_configtext($key, $label, $desc, 0, PARAM_INT, 4));
 
-$settings->add(new admin_setting_configcheckbox('block_teams/invite_needs_acceptance', get_string('defaultteaminviteneedsacceptance', 'block_teams'),
-                   get_string('configdefaultteaminviteneedsacceptance', 'block_teams'), true));
+$key = 'block_teams/invite_needs_acceptance';
+$label = get_string('defaultteaminviteneedsacceptance', 'block_teams');
+$desc = get_string('configdefaultteaminviteneedsacceptance', 'block_teams');
+$settings->add(new admin_setting_configcheckbox($key, $label, $desc, true));
 
-$settings->add(new admin_setting_configcheckbox('block_teams/site_invite', get_string('teamsiteinvite', 'block_teams'),
-                   get_string('configteamsiteinvite', 'block_teams'), 0));
+$key = 'block_teams/site_invite';
+$label = get_string('teamsiteinvite', 'block_teams');
+$desc = get_string('configteamsiteinvite', 'block_teams');
+$settings->add(new admin_setting_configcheckbox($key, $label, $desc, 0));
 
 $selectopts = array(TEAMS_INITIAL_CLOSED => get_string('initiallyclosed', 'block_teams'),
                     TEAMS_INITIAL_OPEN => get_string('initiallyopen', 'block_teams'),
@@ -40,8 +46,10 @@ $selectopts = array(TEAMS_INITIAL_CLOSED => get_string('initiallyclosed', 'block
                     TEAMS_FORCED_OPEN => get_string('forcedopen', 'block_teams'),
                     );
 
-$settings->add(new admin_setting_configselect('block_teams/default_team_visibility', get_string('defaultteamvisibility', 'block_teams'),
-                   get_string('configdefaultteamvisibility', 'block_teams'), TEAMS_INITIAL_CLOSED, $selectopts, PARAM_INT));
+$key = 'block_teams/default_team_visibility';
+$label = get_string('defaultteamvisibility', 'block_teams');
+$desc = get_string('configdefaultteamvisibility', 'block_teams');
+$settings->add(new admin_setting_configselect($key, $label, $desc, TEAMS_INITIAL_CLOSED, $selectopts, PARAM_INT));
 
 $systemcontext = context_system::instance();
 $courselevelroles = get_roles_for_contextlevels(CONTEXT_COURSE);
@@ -52,8 +60,12 @@ foreach ($roles as $rid => $role) {
     $rolemenu[$rid] = $role->localname;
 }
 
-$settings->add(new admin_setting_configselect('block_teams/leader_role', get_string('teamleaderrole', 'block_teams'),
-                   get_string('configteamleaderrole', 'block_teams'), 0, $rolemenu, PARAM_INT));
+$key = 'block_teams/leader_role';
+$label = get_string('teamleaderrole', 'block_teams');
+$desc = get_string('configteamleaderrole', 'block_teams');
+$settings->add(new admin_setting_configselect($key, $label, $desc, 0, $rolemenu, PARAM_INT));
 
-$settings->add(new admin_setting_configselect('block_teams/non_leader_role', get_string('nonteamleaderrole', 'block_teams'),
-                   get_string('confignonteamleaderrole', 'block_teams'), 0, $rolemenu, PARAM_INT));
+$key = 'block_teams/non_leader_role';
+$label = get_string('nonteamleaderrole', 'block_teams');
+$desc = get_string('confignonteamleaderrole', 'block_teams');
+$settings->add(new admin_setting_configselect($key, $label, $desc, 0, $rolemenu, PARAM_INT));

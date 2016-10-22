@@ -21,8 +21,8 @@
  * @copyright  2003 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-/**
+defined('MOODLE_INTERNAL') || die();
+/*
  * Define all the restore steps that wll be used by the restore_teams_block_task
  */
 
@@ -35,35 +35,30 @@ class restore_teams_block_structure_step extends restore_structure_step {
 
         $paths = array();
 
-        // $userinfo = $this->get_setting_value('userinfo');
-
-        // if ($userinfo) {
-            $paths[] = new restore_path_element('block', '/block', true);
-            $paths[] = new restore_path_element('team', '/block/teams/team');
-        // }
+        // TODO : conditionalize with userinfo.
+        $paths[] = new restore_path_element('block', '/block', true);
+        $paths[] = new restore_path_element('team', '/block/teams/team');
 
         return $paths;
     }
 
     public function process_block($data) {
-        global $DB;
-
         // Nothing to do yet here.
+        return;
     }
 
-    /*
-    *
-    */
+    /**
+     *
+     */
     public function process_team($data) {
         global $DB;
 
-        $data  = (object) $data;
-        $oldid = $data->id;
+        $data = (object) $data;
 
         $data->courseid = $this->task->get_courseid();
         $data->leaderid = $this->get_mappingid('user', $data->leaderid);
         $data->groupid = $this->get_mappingid('groups', $data->groupid);
 
-        $ruleid = $DB->insert_record('block_teams', $data);
+        $DB->insert_record('block_teams', $data);
     }
 }
