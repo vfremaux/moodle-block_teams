@@ -44,7 +44,7 @@ class block_teams_testcase extends \advanced_testcase {
     /**
      */
     public function test_block_teams_create_delete_team() {
-        global $DB, $CFG, $COURSE;
+        global $DB, $CFG, $COURSE, $OUTPUT;
 
         $config = get_config('block_teams');
 
@@ -61,7 +61,7 @@ class block_teams_testcase extends \advanced_testcase {
         $COURSE = $course;
 
         // Simulate page opening for controller.
-        $output->header();
+        $OUTPUT->header();
 
         $controller = new \block_teams\manageteam_controller();
         $groupname = 'Team '.fullname($user);
