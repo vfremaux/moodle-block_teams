@@ -34,13 +34,16 @@ class manageteam_controller {
 
     protected $received;
 
-    protected $mform;
+    protected $theblock;
 
-    public function receive($cmd, $data = null, $mform = null) {
+    public __construct($theblock) {
+        $this->theblock = $theblock;
+    }
+
+    public function receive($cmd, $data = null) {
         if (!empty($data)) {
             // Data is fed from outside.
             $this->data = (object)$data;
-            $this->mform = $mform;
             $this->received = true;
             return;
         } else {
@@ -105,7 +108,7 @@ class manageteam_controller {
      * @param object $theblock
      * @param boolean $output if false, will remove all screen output generation (for testing)
      */
-    public function process($cmd, $theblock, $output = true) {
+    public function process($cmd, $output = true) {
         global $DB, $OUTPUT, $USER, $COURSE;
 
         $str = '';
@@ -120,7 +123,7 @@ class manageteam_controller {
         /* ************************************* JOIN GROUP ****************************** */
         if ($cmd == 'joingroup') {
             // If groupmode for this course is set to separate.
-            if (teams_user_can_join($theblock->config, $team)) {
+            if (teams_user_can_join($this->theblock->config, $team)) {
                 $request = new \StdClass();
                 $request->courseid = $COURSE->id;
                 $request->userid = $USER->id;
@@ -167,7 +170,7 @@ class manageteam_controller {
                 $a = new \StdClass();
                 $a->name = fullname($deluser);
                 $a->group = $group->name;
-                $params = array('id' => $theblock->instance->id,
+                $params = array('id' => $this->theblock->instance->id,
                                 'groupid' => $this->data->groupid,
                                 'userid' => $this->data->inviteuserid,
                                 'what' => 'rejectconfirm');
@@ -204,7 +207,7 @@ class manageteam_controller {
                 $DB->delete_records('block_teams_requests', array('id' => $request->id));
 
                 // Now decline all other invites for this course if single team per user !
-                if (empty($theblock->config->allowmultipleteams)) {
+                if (empty($this->theblock->config->allowmultipleteams)) {
                     $select = " userid = ? AND courseid = ? ";
                     $invites = $DB->get_records_select('block_teams_invites', $select, array($USER->id, $COURSE->id));
                     if (!empty($invites)) {
@@ -250,7 +253,7 @@ class manageteam_controller {
 
             $groups = groups_get_all_groups($COURSE->id, $USER->id);
 
-            if (!empty($groups) && empty($theblock->config->allowmultipleteams)) {
+            if (!empty($groups) && empty($this->theblock->config->allowmultipleteams)) {
                 // User is already member of a group, and block config forbids multiple teams.
                 $str .= $OUTPUT->notification(get_string('alreadyinagroup', 'block_teams'));
                 $str .= $OUTPUT->continue_button($coursereturnurl);
@@ -301,7 +304,7 @@ class manageteam_controller {
             $coursecontext = \context_course::instance($COURSE->id);
             teams_set_leader_role($USER->id, $coursecontext);
 
-            if (empty($theblock->config->allowmultipleteams)) {
+            if (empty($this->theblock->config->allowmultipleteams)) {
                 // We need remove all other invites we have.
                 $invites = $DB->get_records('block_teams_invites', array('userid' => $USER->id, 'courseid' => $COURSE->id));
                 if ($invites) {
@@ -344,7 +347,7 @@ class manageteam_controller {
                     $a = new \StdClass();
                     $a->name = fullname($deluser);
                     $a->group = $group->name;
-                    $params = array('id' => $theblock->instance->id,
+                    $params = array('id' => $this->theblock->instance->id,
                                     'groupid' => $group->id,
                                     'userid' => $this->data->deleteuser,
                                     'what' => $cmd.'confirm');
@@ -376,7 +379,7 @@ class manageteam_controller {
                 $str .= $OUTPUT->box_start('generalbox');
                 $str .= $OUTPUT->notification(get_string('errordeleteleader', 'block_teams'));
                 $str .= '<center>';
-                $params = array('id' => $theblock->instance->id, 'groupid' => $group->id);
+                $params = array('id' => $this->theblock->instance->id, 'groupid' => $group->id);
                 $continueurl = new \moodle_url('/blocks/teams/manageteam.php', $params);
                 $str .= $OUTPUT->continue_button($continueurl);
                 $str .= '</center>';
@@ -392,7 +395,7 @@ class manageteam_controller {
 
         } else if ($cmd == 'accept' or $cmd == 'decline') {
             // Show confirmation page.
-            $params = array('id' => $theblock->instance->id,
+            $params = array('id' => $this->theblock->instance->id,
                             'groupid' => $this->data->groupid,
                             'userid' => $this->data->inviteuserid,
                             'what' => $cmd.'confirm');
@@ -441,7 +444,7 @@ class manageteam_controller {
                 $DB->delete_records('block_teams_invites', array('id' => $invite->id));
 
                 // Now decline all other invites for this course if single team per user !
-                if (empty($theblock->config->allowmultipleteams)) {
+                if (empty($this->theblock->config->allowmultipleteams)) {
                     $select = " userid = ? AND courseid = ? ";
                     $invites = $DB->get_records_select('block_teams_invites', $select, array($USER->id, $COURSE->id));
                     if (!empty($invites)) {
@@ -496,7 +499,7 @@ class manageteam_controller {
                     $a = new \StdClass;
                     $a->group = $group->name;
 
-                    $params = array('id' => $theblock->instance->id, 'groupid' => $group->id, 'what' => 'removegroupconfirm');
+                    $params = array('id' => $this->theblock->instance->id, 'groupid' => $group->id, 'what' => 'removegroupconfirm');
                     $confirmurl = new \moodle_url('/blocks/teams/manageteam.php', $params);
                     $str .= $OUTPUT->confirm(get_string('removegroup', 'block_teams', $a), $confirmurl, $coursereturnurl);
                     if ($output) {
@@ -554,7 +557,7 @@ class manageteam_controller {
                             $str .= "<br/>";
                         }
                         if ($gm->id <> $USER->id) {
-                            $params = array('id' => $theblock->instance->id,
+                            $params = array('id' => $this->theblock->instance->id,
                                             'groupid' => $group->id,
                                             'what' => 'transferuser',
                                             'userid' => $gm->id);
@@ -569,7 +572,7 @@ class manageteam_controller {
                     $a->group = $group->name;
                     $user = $DB->get_record('user', array('id' => $this->data->userid));
                     $a->user = fullname($user);
-                    $params = array('id' => $theblock->instance->id,
+                    $params = array('id' => $this->theblock->instance->id,
                                     'groupid' => $this->data->groupid,
                                     'what' => 'transferconfirm',
                                     'userid' => $user->id);
@@ -617,21 +620,21 @@ class manageteam_controller {
             if ($user = $DB->get_record('user', array('id' => $this->data->inviteuserid))) {
                 // Check this users group.
                 $userteams = teams_get_teams($user->id);
-                if (!empty($userteams) && !empty($theblock->config->allowmultipleteams)) {
+                if (!empty($userteams) && !empty($this->theblock->config->allowmultipleteams)) {
                     // If invited user is already in a team and single team.
                     // This is just an integrity check as block GUI should not allow sending this configuration.
                     $str .= $OUTPUT->notification(get_string('useralreadyingroup', 'block_teams'));
                 } else {
                     // Send invite to user.
-                    if (!empty($theblock->config->teaminviteneedsacceptance)) {
-                        $return = teams_send_invite($theblock, $user->id, $USER->id, $group);
+                    if (!empty($this->theblock->config->teaminviteneedsacceptance)) {
+                        $return = teams_send_invite($this->theblock, $user->id, $USER->id, $group);
                         $str .= $OUTPUT->notification($return->message, $return->mode);
                     } else {
-                        $return = teams_add_member($theblock, $user->id, $USER->id, $group);
+                        $return = teams_add_member($this->theblock, $user->id, $USER->id, $group);
                         $str .= $OUTPUT->notification($return->message, $return->mode);
                     }
                 }
-                $params = array('id' => $theblock->instance->id, 'groupid' => $group->id);
+                $params = array('id' => $this->theblock->instance->id, 'groupid' => $group->id);
                 $returnurl = new \moodle_url('/blocks/teams/manageteam.php', $params);
                 $str .= $OUTPUT->continue_button($returnurl);
             }
