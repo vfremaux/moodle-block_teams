@@ -60,13 +60,10 @@ class block_teams_testcase extends \advanced_testcase {
 
         $COURSE = $course;
 
-        // Simulate page opening for controller.
-        $OUTPUT->header();
-
         $controller = new \block_teams\manageteam_controller();
         $groupname = 'Team '.fullname($user);
         $controller->receive('creategroup', array('groupname' => $groupname));
-        list($status, $output) = $controller->process('creategroup', $theblock);
+        list($status, $output) = $controller->process('creategroup', $theblock, false); // No output;
 
         // Check controller returns.
         $this->assertTrue($status == -1);
@@ -80,13 +77,13 @@ class block_teams_testcase extends \advanced_testcase {
         $this->assertTrue($DB->record_exists('role_assignments', $params));
 
         $controller->receive('removegroup', array('groupid' => $group->id));
-        list($status, $output) = $controller->process('removegroup', $theblock);
+        list($status, $output) = $controller->process('removegroup', $theblock, false); // No output;
 
         // Check controller returns.
         $this->assertTrue($status == -1);
 
         $controller->receive('removegroupconfirm', array('groupid' => $group->id));
-        list($status, $output) = $controller->process('removegroupconfirm', $theblock);
+        list($status, $output) = $controller->process('removegroupconfirm', $theblock, false);
 
         // Check controller returns.
         $this->assertTrue($status == -1);

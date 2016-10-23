@@ -99,7 +99,13 @@ class manageteam_controller {
         $this->received = true;
     }
 
-    public function process($cmd, $theblock) {
+    /**
+     * Processes the controller command.
+     * @param string $cmd
+     * @param object $theblock
+     * @param boolean $output if false, will remove all screen output generation (for testing)
+     */
+    public function process($cmd, $theblock, $output = true) {
         global $DB, $OUTPUT, $USER, $COURSE;
 
         $str = '';
@@ -123,12 +129,16 @@ class manageteam_controller {
                 $DB->insert_record('block_teams_requests', $request);
                 $str .= $OUTPUT->notification(get_string('joinrequestposted', 'block_teams'));
                 $str .= $OUTPUT->continue_button($coursereturnurl);
-                $str .= $OUTPUT->footer();
+                if ($output) {
+                    $str .= $OUTPUT->footer();
+                }
                 return array(-1, $str);
             } else {
                 $str .= $OUTPUT->notification(get_string('alreadyinagroup', 'block_teams'));
                 $str .= $OUTPUT->continue_button($coursereturnurl);
-                $str .= $OUTPUT->footer();
+                if ($output) {
+                    $str .= $OUTPUT->footer();
+                }
                 return array(-1, $str);
             }
 
@@ -163,7 +173,9 @@ class manageteam_controller {
                                 'what' => 'rejectconfirm');
                 $confirmurl = new \moodle_url('/blocks/teams/manageteam.php', $params);
                 $str .= $OUTPUT->confirm(get_string('rejectconfirm', 'block_teams', $a), $confirmurl, $coursereturnurl);
-                $str .= $OUTPUT->footer();
+                if ($output) {
+                    $str .= $OUTPUT->footer();
+                }
                 return array(-1, $str);
             } else if ($cmd == 'rejectconfirm') {
                 // Delete invite by invited user. Leaders should not need to use.
@@ -175,7 +187,9 @@ class manageteam_controller {
 
                 $str .= $OUTPUT->notification(get_string('requestrejected', 'block_teams'), 'notifysuccess');
                 $str .= $OUTPUT->continue_button(new \moodle_url('/course/view.php', array('id' => $COURSE->id)));
-                $str .= $OUTPUT->footer();
+                if ($output) {
+                    $str .= $OUTPUT->footer();
+                }
                 return array(-1, $str);
             } else {
                 // Add this user to the group.
@@ -216,7 +230,9 @@ class manageteam_controller {
             if ($USER->id == $this->data->inviteuserid) {
                 // Stop screen if an invited user use case. If team leader, let management screen continue.
                 $str .= $OUTPUT->continue_button(new \moodle_url('/course/view.php', array('id' => $COURSE->id)));
-                $str .= $OUTPUT->footer();
+                if ($output) {
+                    $str .= $OUTPUT->footer();
+                }
                 return array(-1, $str);
             }
 
@@ -226,7 +242,9 @@ class manageteam_controller {
             if (empty($this->data->groupname)) {
                 $str .= $OUTPUT->notification(get_string('emptygroupname', 'block_teams'));
                 $str .= $OUTPUT->continue_button($coursereturnurl);
-                $str .= $OUTPUT->footer();
+                if ($output) {
+                    $str .= $OUTPUT->footer();
+                }
                 return array(-1, $str);
             }
 
@@ -236,14 +254,18 @@ class manageteam_controller {
                 // User is already member of a group, and block config forbids multiple teams.
                 $str .= $OUTPUT->notification(get_string('alreadyinagroup', 'block_teams'));
                 $str .= $OUTPUT->continue_button($coursereturnurl);
-                $str .= $OUTPUT->footer();
+                if ($output) {
+                    $str .= $OUTPUT->footer();
+                }
                 return array(-1, $str);
             }
 
             if ($DB->record_exists('groups', array('name' => $this->data->groupname, 'courseid' => $COURSE->id))) {
                 $str .= $OUTPUT->notification(get_string('groupexists', 'block_teams'));
                 $str .= $OUTPUT->continue_button($coursereturnurl);
-                $str .= $OUTPUT->footer();
+                if ($output) {
+                    $str .= $OUTPUT->footer();
+                }
                 return array(-1, $str);
             }
 
@@ -297,7 +319,9 @@ class manageteam_controller {
 
             $str .= $OUTPUT->notification(get_string('groupcreated', 'block_teams'), 'notifysuccess');
             $str .= $OUTPUT->continue_button($coursereturnurl);
-            $str .= $OUTPUT->footer();
+            if ($output) {
+                $str .= $OUTPUT->footer();
+            }
             return array(-1, $str);
 
             /* ************************************* DELETE INVITE ****************************** */
@@ -334,7 +358,7 @@ class manageteam_controller {
                     // Notify deleted user.
                     teams_send_email($this->data->deleteuser, $USER->id, $group, $cmd);
 
-                    $str = $OUTPUT->notification(get_string('memberdeleted', 'block_teams'), 'notifysuccess');
+                    $str .= $OUTPUT->notification(get_string('memberdeleted', 'block_teams'), 'notifysuccess');
                     $str .= $OUTPUT->continue_button($coursereturnurl);
                 } else if ($cmd == 'deleteinvconfirm') {
                     $params = array('groupid' => $group->id, 'userid' => $this->data->deleteuser);
@@ -357,7 +381,9 @@ class manageteam_controller {
                 $str .= $OUTPUT->continue_button($continueurl);
                 $str .= '</center>';
                 $str .= $OUTPUT->box_end();
-                $str .= $OUTPUT->footer();
+                if ($output) {
+                    $str .= $OUTPUT->footer();
+                }
                 return array(-1, $str);
             }
 
@@ -372,7 +398,9 @@ class manageteam_controller {
                             'what' => $cmd.'confirm');
             $confirmurl = new \moodle_url('/blocks/teams/manageteam.php', $params);
             $str .= $OUTPUT->confirm(get_string($cmd.'invite', 'block_teams'), $confirmurl, $coursereturnurl);
-            $str .= $OUTPUT->footer();
+            if ($output) {
+                $str .= $OUTPUT->footer();
+            }
             return array(-1, $str);
 
             /* ************************************* CONFIRM ACCEPT/DECLINE ****************************** */
@@ -399,7 +427,6 @@ class manageteam_controller {
                 // Delete invite by invited user. Leaders should not need to use.
                 $DB->delete_records('block_teams_invites', array('id' => $invite->id));
                 $str .= $OUTPUT->notification(get_string('invitedeclined', 'block_teams'), 'notifysuccess');
-
             } else {
                 // Add this user to the group.
                 $newgroupmember = new \StdClass;
@@ -443,7 +470,9 @@ class manageteam_controller {
             if ($USER->id == $this->data->inviteuserid) {
                 // Stop screen if an invited user use case. If team leader, let management screen continue.
                 $str .= $OUTPUT->continue_button(new \moodle_url('/course/view.php', array('id' => $COURSE->id)));
-                $str .= $OUTPUT->footer();
+                if ($output) {
+                    $str .= $OUTPUT->footer();
+                }
                 return array(-1, $str);
             }
 
@@ -470,7 +499,9 @@ class manageteam_controller {
                     $params = array('id' => $theblock->instance->id, 'groupid' => $group->id, 'what' => 'removegroupconfirm');
                     $confirmurl = new \moodle_url('/blocks/teams/manageteam.php', $params);
                     $str .= $OUTPUT->confirm(get_string('removegroup', 'block_teams', $a), $confirmurl, $coursereturnurl);
-                    $str .= $OUTPUT->footer();
+                    if ($output) {
+                        $str .= $OUTPUT->footer();
+                    }
                     return array(-1, $str);
 
                 } else if ($cmd == 'removegroupconfirm') {
@@ -491,7 +522,9 @@ class manageteam_controller {
                     // Remove team side record and get out from management.
                     $str .= $OUTPUT->notification(get_string('groupdeleted', 'block_teams'), 'notifysuccess');
                     $str .= $OUTPUT->continue_button($coursereturnurl);
-                    $str .= $OUTPUT->footer();
+                    if ($output) {
+                        $str .= $OUTPUT->footer();
+                    }
                     return array(-1, $str);
                 }
             } else {
@@ -542,7 +575,9 @@ class manageteam_controller {
                                     'userid' => $user->id);
                     $confirmurl = new \moodle_url('/blocks/teams/manageteam.php', $params);
                     $str .= $OUTPUT->confirm(get_string('transferuser', 'block_teams', $a), $confirmurl, $coursereturnurl);
-                    $str .= $OUTPUT->footer();
+                    if ($output) {
+                        $str .= $OUTPUT->footer();
+                    }
                     die;
                 } else if ($cmd == 'transferconfirm') {
                     $team->leaderid = $this->data->userid;
