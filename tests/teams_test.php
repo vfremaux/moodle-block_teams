@@ -72,10 +72,13 @@ class block_teams_testcase extends \advanced_testcase {
         $this->assertTrue(!empty($group->id));
         $params = array('leaderid' => $user->id, 'groupid' => $group->id, 'courseid' => $course->id);
         $this->assertTrue($DB->record_exists('block_teams', $params));
-        // Check the user has leader role.
-        $context = context_course::instance($course->id);
-        $params = array('roleid' => $config->leader_role, 'userid' => $user->id, 'contextid' => $context->id);
-        $this->assertTrue($DB->record_exists('role_assignments', $params));
+
+        // Check the user has leader role, if leader role is set in test case.
+        if ($config->leader_role) {
+            $context = context_course::instance($course->id);
+            $params = array('roleid' => $config->leader_role, 'userid' => $user->id, 'contextid' => $context->id);
+            $this->assertTrue($DB->record_exists('role_assignments', $params));
+        }
 
         $controller->receive('removegroup', array('groupid' => $group->id));
         list($status, $output) = $controller->process('removegroup', $theblock, false); // No output;
