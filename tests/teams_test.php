@@ -68,7 +68,8 @@ class block_teams_testcase extends \advanced_testcase {
         // Check controller returns.
         $this->assertTrue($status == -1);
         // Check group and team exist.
-        $this->assertTrue($group = $DB->get_record('groups', array('courseid' => $course->id, 'name' => $groupname)));
+        $group = $DB->get_record('groups', array('courseid' => $course->id, 'name' => $groupname));
+        $this->assertTrue(!empty($group->id));
         $params = array('leaderid' => $user->id, 'groupid' => $group->id, 'courseid' => $course->id);
         $this->assertTrue($DB->record_exists('block_teams', $params));
         // Check the user has leader role.
