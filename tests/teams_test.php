@@ -55,15 +55,24 @@ class block_teams_testcase extends \advanced_testcase {
         $theblock = new StdClass;
         $theblock->config = new Stdclass;
         $theblock->config->allowmultipleteams = false;
+        $theblock->config->allowleadmultipleteams = true;
+        $theblock->config->teaminviteneedsacceptance = false;
+        $theblock->config->teamsiteinvite = true;
+        $theblock->config->allowrequests = true;
+        $theblock->config->teamvisibility = TEAMS_INITIAL_OPEN;
+        $theblock->config->teammaxsize = 10;
+        $theblock->config->teamname = 'Team';
+        $theblock->instance = new StdClass;
+        $theblock->instance->id = 1;
 
         $this->setUser($user);
 
         $COURSE = $course;
 
-        $controller = new \block_teams\manageteam_controller();
+        $controller = new \block_teams\manageteam_controller($theblock);
         $groupname = 'Team '.fullname($user);
         $controller->receive('creategroup', array('groupname' => $groupname));
-        list($status, $output) = $controller->process('creategroup', $theblock, false); // No output;
+        list($status, $output) = $controller->process('creategroup', false); // No output;
 
         // Check controller returns.
         $this->assertTrue($status == -1);
@@ -72,19 +81,22 @@ class block_teams_testcase extends \advanced_testcase {
         $this->assertTrue(!empty($group->id));
         $params = array('leaderid' => $user->id, 'groupid' => $group->id, 'courseid' => $course->id);
         $this->assertTrue($DB->record_exists('block_teams', $params));
-        // Check the user has leader role.
-        $context = context_course::instance($course->id);
-        $params = array('roleid' => $config->leader_role, 'userid' => $user->id, 'contextid' => $context->id);
-        $this->assertTrue($DB->record_exists('role_assignments', $params));
+
+        // Check the user has leader role, if leader role is set in test case.
+        if ($config->leader_role) {
+            $context = context_course::instance($course->id);
+            $params = array('roleid' => $config->leader_role, 'userid' => $user->id, 'contextid' => $context->id);
+            $this->assertTrue($DB->record_exists('role_assignments', $params));
+        }
 
         $controller->receive('removegroup', array('groupid' => $group->id));
-        list($status, $output) = $controller->process('removegroup', $theblock, false); // No output;
+        list($status, $output) = $controller->process('removegroup', false); // No output;
 
         // Check controller returns.
         $this->assertTrue($status == -1);
 
         $controller->receive('removegroupconfirm', array('groupid' => $group->id));
-        list($status, $output) = $controller->process('removegroupconfirm', $theblock, false);
+        list($status, $output) = $controller->process('removegroupconfirm', false);
 
         // Check controller returns.
         $this->assertTrue($status == -1);
