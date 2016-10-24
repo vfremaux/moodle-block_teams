@@ -108,9 +108,9 @@ echo $OUTPUT->heading(get_string('teamgroup', 'block_teams', $group->name));
 
 if (!empty($action)) {
     include_once($CFG->dirroot.'/blocks/teams/manageteam.controller.php');
-    $controller = new \block_teams\manageteam_controller();
+    $controller = new \block_teams\manageteam_controller($theblock);
     $controller->receive($action);
-    list($status, $output) = $controller->process($action, $theblock);
+    list($status, $output) = $controller->process($action);
     if ($status == -1) {
         // Controller requires page finishes.
         echo $output;
