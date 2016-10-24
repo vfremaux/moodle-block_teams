@@ -102,6 +102,6 @@ class block_teams_testcase extends \advanced_testcase {
         $this->assertTrue($status == -1);
 
         $this->assertFalse($DB->get_record('groups', array('id' => $group->id)));
-        $this->assertFalse($DB->get_record('block_teams', array('userid' => $user->id, 'courseid' => $course->id)));
+        $this->assertFalse($DB->get_record('block_teams', array('leaderid' => $user->id, 'courseid' => $course->id)));
     }
 }
