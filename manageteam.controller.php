@@ -36,7 +36,7 @@ class manageteam_controller {
 
     protected $theblock;
 
-    public __construct($theblock) {
+    public function __construct($theblock) {
         $this->theblock = $theblock;
     }
 
