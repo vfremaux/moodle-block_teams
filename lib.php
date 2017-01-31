@@ -384,9 +384,8 @@ function teams_remove_leader_role($userid, $context) {
 
     $config = get_config('block_teams');
 
+    $empowered = false;
     if ($oldrolesassigns = get_user_roles($context, $userid, false)) {
-
-        $empowered = false;
         foreach ($oldrolesassigns as $ra) {
             $archetype = $DB->get_field('role', 'archetype', array('shortname' => $ra->shortname));
             if (in_array($archetype, array('teacher', 'editingteacher', 'coursecreator', 'manager'))) {

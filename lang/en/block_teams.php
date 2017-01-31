@@ -227,8 +227,8 @@ $string['transferconfirmemailbody'] = 'Hi {$a->firstname},
 the leadership has been transfered for "{$a->group}" in course "{$a->course} to user {$a->user}".
 ';
 
-$string['acceptjoinemailsubject'] = 'Demande d\'accès au groupe acceptée.';
-$string['acceptjoinemailbody'] = 'Bonjour {$a->firstname},
+$string['acceptjoinemailsubject'] = 'Teams / Join request accepted';
+$string['acceptjoinemailbody'] = 'Hello {$a->firstname},
 
 Your request to join group "{$a->group}" in course <a href="{$a->courseurl}">"{$a->course}"</a> has been accepted. You are now member of the group.
 ';
