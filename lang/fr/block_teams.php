@@ -23,11 +23,11 @@
  */
 
 // Capabilities.
-$string['teams:addinstance'] = 'Peut ajouter une instance';
-$string['teams:manageteams'] = 'Peut gérer les équipes';
-$string['teams:creategroup'] = 'Peut créer une équipe';
-$string['teams:transferownership'] = 'Peut donner le leadership';
-$string['teams:apply'] = 'Peut rejoindre une équipe';
+$string['teams:addinstance'] = 'Peut ajouter une instance'; // @DYNAKEY.
+$string['teams:manageteams'] = 'Peut gérer les équipes'; // @DYNAKEY.
+$string['teams:creategroup'] = 'Peut créer une équipe'; // @DYNAKEY.
+$string['teams:transferownership'] = 'Peut donner le leadership'; // @DYNAKEY.
+$string['teams:apply'] = 'Peut rejoindre une équipe'; // @DYNAKEY.
 
 // Teams stuff.
 
@@ -41,7 +41,7 @@ $string['alreadyinagroup'] = 'Vous êtes déjà dans une équipe du cours';
 $string['alreadyinvited'] = 'Cet utilisateur est déjà invité à rejoindre une équipe';
 $string['alreadyinvitedtogroup'] = 'Cet utilisateur est déjà invité à rejoindre cette équipe';
 $string['backtocourse'] = 'Revenir au cours';
-$string['blockname'] = 'Equipes';
+$string['blockname'] = 'Equipes'; // @DYNAKEY.
 $string['buildteam'] = 'Monter une équipe avec ce leader';
 $string['changeleaderto'] = 'Choisir comme leader';
 $string['closed'] = 'Equipe privée';
