@@ -138,13 +138,13 @@ if (empty($action) && isset($group->id)) {
             if ($gm->id != $USER->id) {
                 $params = array('id' => $blockid, 'what' => 'transferuser', 'userid' => $gm->id, 'groupid' => $groupid);
                 $manageurl = new moodle_url('/blocks/teams/manageteam.php', $params);
-                $pix = '<img src="'.$OUTPUT->pix_url('transfer', 'block_teams').'" />';
-                $cmds .= ' <a title="'.get_string('transferto', 'block_teams').'" href="'.$manageurl.'">'.$pix.'</a>';
+                $pix = $OUTPUT->pix_icon('transfer', get_string('transferto', 'block_teams'), 'block_teams');
+                $cmds .= ' <a href="'.$manageurl.'">'.$pix.'</a>';
             }
             $params = array('id' => $blockid, 'what' => 'delete', 'userid' => $gm->id, 'groupid' => $groupid);
             $manageurl = new moodle_url('/blocks/teams/manageteam.php', $params);
-            $pix = '<img src="'.$OUTPUT->pix_url('t/delete').'" />';
-            $cmds .= ' <a title="'.get_string('deletemember', 'block_teams').'" href="'.$manageurl.'">'.$pix.'</a>';
+            $pix = $OUTPUT->pix_icon('t/delete', get_string('deletemember', 'block_teams'));
+            $cmds .= ' <a href="'.$manageurl.'">'.$pix.'</a>';
             $table->data[] = array($userlink, $cmds);
         }
         echo html_writer::table($table);
@@ -184,13 +184,13 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
                 // Add capability to force acceptance.
                 $params = array('id' => $blockid, 'what' => 'accept', 'userid' => $inv->userid, 'groupid' => $groupid);
                 $accepturl = new moodle_url('/blocks/teams/manageteam.php', $params);
-                $pix = '<img src="'.$OUTPUT->pix_url('t/add').'" />';
-                $cmds = '<a title="'.get_string('forceinvite', 'block_teams').'" href="'.$accepturl.'">'.$pix.'</a>';
+                $pix = $OUTPUT->pix_icon('t/add', get_string('forceinvite', 'block_teams'));
+                $cmds = '<a href="'.$accepturl.'">'.$pix.'</a>';
             }
             $params = array('id' => $blockid, 'what' => 'deleteinv', 'userid' => $inv->userid, 'groupid' => $groupid);
             $manageurl = new moodle_url('/blocks/teams/manageteam.php', $params);
-            $pix = '<img src="'.$OUTPUT->pix_url('t/delete').'" />';
-            $cmds .= ' <a title="'.get_string('revokeinvite', 'block_teams').'" href="'.$manageurl.'">'.$pix.'</a>';
+            $pix = $OUTPUT->pix_icon('t/delete', get_string('revokeinvite', 'block_teams'));
+            $cmds .= ' <a href="'.$manageurl.'">'.$pix.'</a>';
             $date = teams_date_format($inv->timemodified);
             $table->data[] = array($userlink, $date, $cmds);
             $invitecount++;
@@ -315,7 +315,7 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
                     } else {
                         $columnicon = $dir == 'ASC' ? 'down' : 'up';
                     }
-                    $columnicon = ' <img src="'.$OUTPUT->pix_url('/t/$columnicon').'" alt="" />';
+                    $columnicon = ' '.$OUTPUT->pix_icon('/t/$columnicon', '');
 
                 }
                 $params = array('id' => $blockid, 'groupid' => $groupid, 'sort' => $column, 'dir' => $columndir);

@@ -100,7 +100,7 @@ class block_teams_renderer extends plugin_renderer_base {
                                     'what' => 'deleteinv',
                                     'userid' => $inv->userid);
                     $manageurl = new moodle_url('/blocks/teams/manageteam.php', $params);
-                    $str .= ' <a href="'.$manageurl.'"><img src="'.$OUTPUT->pix_url('t/delete').'"></a>';
+                    $str .= ' <a href="'.$manageurl.'">'.$OUTPUT->pix_icon('t/delete', get_string('delete')).'</a>';
                 } else {
                     if ($inv->userid == $USER->id) {
                         // Accept pending invite if it's me.
@@ -198,8 +198,8 @@ class block_teams_renderer extends plugin_renderer_base {
             $str .= '<span class="team-pending-label">'.get_string('pendingrequest', 'block_teams').'</span>';
             $params = array('id' => $theblock->instance->id, 'groupid' => $team->groupid, 'what' => 'removejoin');
             $dismissurl = new moodle_url('/blocks/teams/manageteam.php', $params);
-            $pix = '<img src="'.$OUTPUT->pix_url('t/delete').'" />';
-            $link = '<a href="'.$dismissurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
+            $pix = $OUTPUT->pix_icon('t/delete', get_string('delete'));
+            $link = '<a href="'.$dismissurl.'">'.$pix.'</a>';
             $str .= '<div class="team-line-cmd">'.$link.'</div>';
             $str .= '</div>';
         }
@@ -247,7 +247,7 @@ class block_teams_renderer extends plugin_renderer_base {
                 // Show delete member link if i am leader.
                 $params = array('id' => $blockid, 'groupid' => $team->id, 'what' => 'delete', 'userid' => $gm->id);
                 $deleteurl = new moodle_url('/blocks/teams/manageteam.php', $params);
-                $str .= ' <a href="'.$deleteurl.'"><img src="'.$OUTPUT->pix_url('/t/delete').'" /></a>';
+                $str .= ' <a href="'.$deleteurl.'">'.$OUTPUT->pix_icon('/t/delete', get_string('delete')).'</a>';
             }
             $str .= '<br/>';
         }
@@ -282,26 +282,26 @@ class block_teams_renderer extends plugin_renderer_base {
         switch ($render) {
             case 'unlocklink':
                 $url->params(array('what' => 'unlock', 'groupid' => $groupid, 'buiid' => $theblock->instance->id));
-                $pix = '<img src="'.$OUTPUT->pix_url('t/unlock').'"/>';
-                $str .= '<a title="'.get_string('openteam', 'block_teams').'" href="'.$url.'">'.$pix.'</a>';
+                $pix = $OUTPUT->pix_icon('t/unlock', get_string('openteam', 'block_teams'));
+                $str .= '<a href="'.$url.'">'.$pix.'</a>';
                 break;
 
             case 'locklink':
                 $url->params(array('what' => 'lock', 'groupid' => $groupid, 'buiid' => $theblock->instance->id));
-                $pix = '<img src="'.$OUTPUT->pix_url('t/lock').'"/>';
-                $str .= '<a title="'.get_string('closeteam', 'block_teams').'" href="'.$url.'">'.$pix.'</a>';
+                $pix = $OUTPUT->pix_icon('t/lock', get_string('closeteam', 'block_teams'));
+                $str .= '<a href="'.$url.'">'.$pix.'</a>';
                 break;
 
             case 'unlockedicon':
                 $url->params(array('what' => 'unlock', 'groupid' => $groupid, 'buiid' => $theblock->instance->id));
-                $pix = '<img src="'.$OUTPUT->pix_url('t/unlocked').'"/>';
-                $str .= '<span title="'.get_string('open', 'block_teams').'" class="team-shadowed">'.$pix.'</span>';
+                $pix = $OUTPUT->pix_icon('t/unlocked', get_string('open', 'block_teams'));
+                $str .= '<span class="team-shadowed">'.$pix.'</span>';
                 break;
 
             case 'lockedicon':
                 $url->params(array('what' => 'lock', 'groupid' => $groupid, 'buiid' => $theblock->instance->id));
-                $pix = '<img src="'.$OUTPUT->pix_url('t/locked').'"/>';
-                $str .= '<span title="'.get_string('closed', 'block_teams').'" class="team-shadowed">'.$pix.'</span>';
+                $pix = $OUTPUT->pix_icon('t/locked', get_string('closed', 'block_teams'));
+                $str .= '<span class="team-shadowed">'.$pix.'</span>';
                 break;
         }
 

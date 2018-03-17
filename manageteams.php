@@ -97,8 +97,8 @@ foreach ($teams as $t) {
                                 'sesskey' => sesskey());
                 $changeleaderurl = new moodle_url('/blocks/teams/manageteams.php', $params);
                 $title = get_string('changeleaderto', 'block_teams');
-                $pix = '<img src="'.$OUTPUT->pix_url('i/enrolusers').'">';
-                $command = ' <a href="'.$changeleaderurl.'" title="'.$title.'">'.$pix.'</a>';
+                $pix = $OUTPUT->pix_icon('i/enrolusers', $title);
+                $command = ' <a href="'.$changeleaderurl.'">'.$pix.'</a>';
                 $others[] = fullname($m).$command;
             }
         }
@@ -107,8 +107,8 @@ foreach ($teams as $t) {
 
     $params = array('id' => $id, 'what' => 'deleteteam', 'groupid' => $t->groupid, 'sesskey' => sesskey());
     $deleteurl = new moodle_url('/blocks/teams/manageteams.php', $params);
-    $pix = '<img src="'.$OUTPUT->pix_url('t/delete').'">';
-    $commands = ' <a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
+    $pix = $OUTPUT->pix_icon('t/delete', get_string('delete'));
+    $commands = ' <a href="'.$deleteurl.'">'.$pix.'</a>';
 
     $table->data[] = array($teamname, '<b>'.$leader.'</b>', $othermembers, $commands);
 }
@@ -137,16 +137,16 @@ if ($unteamedgroups) {
                                 'sesskey' => sesskey());
                 $maketeamurl = new moodle_url('/blocks/teams/manageteams.php', $params);
                 $title = get_string('buildteam', 'block_teams');
-                $pix = '<img src="'.$OUTPUT->pix_url('i/users').'">';
-                $command = ' <a href="'.$maketeamurl.'" title="'.$title.'">'.$pix.'</a>';
+                $pix = $OUTPUT->pix_icon('i/users', $title);
+                $command = ' <a href="'.$maketeamurl.'">'.$pix.'</a>';
                 $others[] = fullname($m). $command;
             }
             $othermembers = implode(', ', $others);
         }
         $params = array('id' => $id, 'what' => 'deletegroup', 'groupid' => $g->id, 'sesskey' => sesskey());
         $deleteurl = new moodle_url('/blocks/teams/manageteams.php', $params);
-        $pix = '<img src="'.$OUTPUT->pix_url('t/delete').'">';
-        $commands = ' <a href="'.$deleteurl.'" title="'.get_string('delete').'">'.$pix.'</a>';
+        $pix = $OUTPUT->pix_icon('t/delete', get_string('delete'));
+        $commands = ' <a href="'.$deleteurl.'">'.$pix.'</a>';
 
         $unteamedtable->data[] = array($g->name, $othermembers, $commands);
     }
