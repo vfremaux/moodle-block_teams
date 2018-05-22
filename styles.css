@@ -1,66 +1,67 @@
+
 .team-invite {
-    border:1px solid #606060;
-    border-radius:3px;
-    padding:1px;
+    border: 1px solid #606060;
+    border-radius: 3px;
+    padding: 1px;
 }
 
 .team-groupname {
-    font-weight:bolder;
+    font-weight: bolder;
 }
 
 .team-invided-member {
-    -moz-opacity:0.5;
-    opacity:0.5;
+    -moz-opacity: 0.5;
+    opacity: 0.5;
 }
 
 .team-instance {
-    background-color:#e0e0e0;
-    margin-bottom:10px;
-    padding:2px;
+    background-color: #e0e0e0;
+    margin-bottom: 10px;
+    padding: 2px;
 }
 
 .team-status-indicator {
-    float:right;
-} 
+    float: right;
+}
 
 team-shadowed {
-    -moz-opacity:0.5;
-    opacity:0.5;
+    -moz-opacity: 0.5;
+    opacity: 0.5;
 }
 
-.team-date-green{
-    color:#2B8C20;
+.team-date-green {
+    color: #2bbc20;
 }
 
-.team-date-yellow{
-    color:#ABB324;
+.team-date-yellow {
+    color:#abb324;
 }
 
-.team-date-orange{
-    color:#A28824;
+.team-date-orange {
+    color:#a28824;
 }
 
-.team-date-red{
-    color:#D73939;
+.team-date-red {
+    color: #d73939;
 }
 
 .team-line-cmd {
-    float:right;
+    float: right;
 }
 
 .team-pending-request {
-    background-color:#FFA0A0;
+    background-color: #ffa0a0;
 }
 
 .team-requests {
-    padding-left:5px;
+    padding-left: 5px;
 }
 
-.team-request-team .team-groupname{
-    font-size:0.8em;
+.team-request-team .team-groupname {
+    font-size: 0.8em;
 }
 
 .block_teams.block .footer {
-    font-size:0.9em;
-    padding-top:10px;
+    font-size: 0.9em;
+    padding-top: 10px;
 }
