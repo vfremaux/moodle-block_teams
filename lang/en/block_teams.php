@@ -169,6 +169,18 @@ $string['initiallyopen'] = 'Initially visible';
 $string['forcedclosed'] = 'Private (forced)';
 $string['forcedopen'] = 'Visible (forced)';
 
+$string['privacy:metadata:teams'] = 'User\'s team ownership or participation in a course.';
+$string['privacy:metadata:teams:leaderid'] = 'The user team owning ID';
+$string['privacy:metadata:teams:id'] = 'The ID of the owned team';
+$string['privacy:metadata:teams:groupid'] = 'the course group ID which is owned ad leader';
+$string['privacy:metadata:teams_invites'] = 'Invites for membership made to the user';
+$string['privacy:metadata:teams_invites:userid'] = 'The user ID being invited';
+$string['privacy:metadata:teams_invites:fromuserid'] = 'The inviter ID';
+$string['privacy:metadata:teams_invites:groupid'] = 'the course group ID in which the user is invited in';
+$string['privacy:metadata:teams_requests'] = 'Requests for membership made by the user';
+$string['privacy:metadata:teams_requests:userid'] = 'The requesting user ID';
+$string['privacy:metadata:teams_requests:groupid'] = 'The group ID the user requests membership of';
+
 // Messages.
 
 $string['inviteemailsubject'] = 'Teams / Group invite';
