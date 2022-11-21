@@ -86,10 +86,7 @@ foreach ($teams as $t) {
     $leader = fullname($leaderuser);
 
     $othermembers = '';
-    // M4.
-    $fields = \core_user\fields::for_name()->with_userpic()->excluding('id')->get_required_fields();
-    $fields = 'u.id,'.implode(',', $fields);
-    if ($members = groups_get_members($t->groupid,  $fields)) {
+    if ($members = groups_get_members($t->groupid,  'u.id,'.get_all_user_name_fields(true, 'u'))) {
         $others = array();
         foreach ($members as $m) {
             if ($m->id != $t->leaderid) {
@@ -130,10 +127,7 @@ if ($unteamedgroups) {
 
     foreach ($unteamedgroups as $g) {
         $othermembers = '';
-        // M4.
-        $fields = \core_user\fields::for_name()->with_userpic()->excluding('id')->get_required_fields();
-        $fields = 'u.id,'.implode(',', $fields);
-        if ($members = groups_get_members($g->id,  $fields)) {
+        if ($members = groups_get_members($g->id,  'u.id,'.get_all_user_name_fields(true, 'u'))) {
             $others = array();
             foreach ($members as $m) {
                 $params = array('id' => $id,
