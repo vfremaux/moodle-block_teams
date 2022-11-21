@@ -368,7 +368,7 @@ if ($group && isset($group->id) && empty($action) && ($team->leaderid == $USER->
 
                 $mainadmin = get_admin();
 
-                $override = new object();
+                $override = new StdClass();
                 $override->firstname = 'firstname';
                 $override->lastname = 'lastname';
                 $fullnamelanguage = get_string('fullnamedisplay', '', $override);
